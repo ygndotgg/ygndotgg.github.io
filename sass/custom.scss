@@ -1,9 +1,12 @@
 @import "mobile";
 
-html, body, .container, main {
+html, body {
   zoom: 200% !important;
+  -moz-transform: scale(2);
+  -moz-transform-origin: top left;
   transform: scale(2);
   transform-origin: top left;
+  width: 50%;
 }
 
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
