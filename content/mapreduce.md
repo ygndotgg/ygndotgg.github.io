@@ -2,7 +2,8 @@
 title = "MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch"
 date = 2025-02-15
 [taxonomies]
-tags = []
+tags = ["rust", "distributed-systems", "mapreduce"]
+categories = ["programming"]
 +++
 
 # MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch

@@ -45,15 +45,19 @@ include_content = true
 
 [extra]
 author = "YGN"
-comments = false
+comments = true
+giscus_repo = "ygndotgg/personal-blog"
+giscus_repo_id = "R_kgDORbe62A"
+giscus_data_category_id = "DIC_kwDORbe62M4C3cVZ"
+giscus_data_category = "General"
 radion_title = "YGN's Blog"
 radion_menu = [
     { name = "Home", url = "$BASE_URL" },
     { name = "Categories", url = "$BASE_URL/categories" },
     { name = "Tags", url = "$BASE_URL/tags" },
-    { name = "GitHub", url = "https://github.com/ygndotgg" },
-    { name = "RSS", url = "$BASE_URL/rss.xml" },
+    { name = "Portfolio", url = "https://gaganyt.vercel.app" },
 ]
 github = "https://github.com/ygndotgg"
+mastodon = "https://x.com/ygndotgg"
 theme = "toggle"
 enable_search = true

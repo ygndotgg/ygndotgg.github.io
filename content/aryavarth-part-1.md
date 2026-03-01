@@ -2,7 +2,8 @@
 title = "Aryavarth: Distributed Key Value Store Part 1"
 date = 2025-02-05
 [taxonomies]
-tags = []
+tags = ["rust", "distributed-systems", "storage"]
+categories = ["programming"]
 +++
 
 # Aryavarth: Distributed Key Value Store - Part 1

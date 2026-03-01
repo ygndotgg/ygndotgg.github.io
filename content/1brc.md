@@ -2,7 +2,8 @@
 title = "brrrc: Processing One Billion Rows in 3.29 Seconds"
 date = 2025-01-23
 [taxonomies]
-tags = []
+tags = ["rust", "performance", "optimization"]
+categories = ["programming"]
 +++
 
 # brrrc: Processing One Billion Rows in 3.29 Seconds
