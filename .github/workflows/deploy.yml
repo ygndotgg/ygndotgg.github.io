@@ -34,10 +34,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-      - name: Build and deploy
+      - name: Setup Zola
         uses: shalzz/zola-deploy-action@v0.22.1
         env:
           BUILD_DIR: .
-          PAGES_BRANCH: gh-pages
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          BASE_URL: https://ygndotgg.github.io
