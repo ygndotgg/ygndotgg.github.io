@@ -1,7 +1,9 @@
 @import "mobile";
 
 html {
-  font-size: 150% !important;
+  zoom: 150%;
+  transform: scale(1.5);
+  transform-origin: top left;
 }
 
 .dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
