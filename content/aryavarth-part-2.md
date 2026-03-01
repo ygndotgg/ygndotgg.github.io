@@ -3,7 +3,7 @@ title = "Aryavarth: Distributed Key Value Store Part 2"
 date = 2025-02-10
 [taxonomies]
 tags = ["rust", "distributed-systems", "networking", "concurrency"]
-categories = ["programming"]
+categories = ["rust", "systems", "networking"]
 +++
 
 # Aryavarth: Distributed Key Value Store - Part 2
@@ -26,13 +26,13 @@ This is Part 2: where we transform our local KvStore into a **networked, concurr
 
 ## What This Post Covers
 
-**[Part I: The Networking Layer](/aryavarth2)** - TCP servers, Rust async, and turning a library into a service
+**[Part I: The Networking Layer](/aryavarth-part-2/#part-i-the-networking-layer)** - TCP servers, Rust async, and turning a library into a service
 
-**[Part II: Thread Safety](/aryavarth2)** - Mutexes, locks, and the challenges of concurrent access
+**[Part II: Thread Safety](/aryavarth-part-2/#part-ii-thread-safety)** - Mutexes, locks, and the challenges of concurrent access
 
-**[Part III: Lock-Free Concurrency](/aryavarth2)** - Atomic operations, lock-free data structures, and performance
+**[Part III: Lock-Free Concurrency](/aryavarth-part-2/#part-iii-lock-free-concurrency)** - Atomic operations, lock-free data structures, and performance
 
-**[Part IV: The Complete Architecture](/aryvarth2)** - Putting it all together in Rust
+**[Part IV: The Complete Architecture](/aryavarth-part-2/#part-iv-the-complete-architecture)** - Putting it all together in Rust
 
 ---
 

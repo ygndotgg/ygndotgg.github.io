@@ -3,7 +3,7 @@ title = "MapReduce in Rust: A Hands-On Guide to Building Distributed Systems fro
 date = 2025-02-15
 [taxonomies]
 tags = ["rust", "distributed-systems", "mapreduce"]
-categories = ["programming"]
+categories = ["rust", "systems"]
 +++
 
 # MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch
@@ -20,13 +20,13 @@ This is a technical deep-dive into building a MapReduce system in Rust, from fir
 
 ## What This Post Covers
 
-**Part I: The Foundation** - RPC, gRPC, and the communication layer that makes distributed systems possible
+**[Part I: The Foundation](/mapreduce/#part-i-the-foundation)** - RPC, gRPC, and the communication layer that makes distributed systems possible
 
-**Part II: The Master** - Task scheduling, fault tolerance through backup tasks, and health checks for stuck workers
+**[Part II: The Master](/mapreduce/#part-ii-the-master)** - Task scheduling, fault tolerance through backup tasks, and health checks for stuck workers
 
-**Part III: The Worker** - Map and Reduce implementation, partitioning, and atomic file operations
+**[Part III: The Worker](/mapreduce/#part-iii-the-worker)** - Map and Reduce implementation, partitioning, and atomic file operations
 
-**Part IV: The Complete System** - Putting it all together, code architecture, and running the system
+**[Part IV: The Complete System](/mapreduce/#part-iv-the-complete-system)** - Putting it all together, code architecture, and running the system
 
 ---
 

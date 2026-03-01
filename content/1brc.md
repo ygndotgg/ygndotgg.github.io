@@ -3,7 +3,7 @@ title = "brrrc: Processing One Billion Rows in 3.29 Seconds"
 date = 2025-01-23
 [taxonomies]
 tags = ["rust", "performance", "optimization"]
-categories = ["programming"]
+categories = ["rust", "performance"]
 +++
 
 # brrrc: Processing One Billion Rows in 3.29 Seconds
@@ -20,13 +20,13 @@ NOTE: This is a technical deep-dive into **1brc**, a solution to the One Billion
 
 ## What This Post Covers
 
-**[Part I: The Naive Foundation](https://ygndotgg.github.io/1brc-blog/#part-i-the-naive-foundation)** - BufferedReader, HashMap, and why the obvious approach fails at scale
+**[Part I: The Naive Foundation](/1brc/#part-i-the-naive-foundation)** - BufferedReader, HashMap, and why the obvious approach fails at scale
 
-**[Part II: The Memory Revolution](https://ygndotgg.github.io/1brc-blog/#part-ii-the-memory-revolution)** - Memory-mapped I/O, kernel bypass, and the art of zero-copy
+**[Part II: The Memory Revolution](/1brc/#part-ii-the-memory-revolution)** - Memory-mapped I/O, kernel bypass, and the art of zero-copy
 
-**[Part III: The Parsing Pipeline](https://ygndotgg.github.io/1brc-blog/#part-iii-the-parsing-pipeline)** - Integer arithmetic, memchr, SIMD vectorization
+**[Part III: The Parsing Pipeline](/1brc/#part-iii-the-parsing-pipeline)** - Integer arithmetic, memchr, SIMD vectorization
 
-**[Part IV: The Architecture](https://ygndotgg.github.io/1brc-blog/#part-iv-the-architecture)** - Multi-threading, custom data structures, and the final assembly
+**[Part IV: The Architecture](/1brc/#part-iv-the-architecture)** - Multi-threading, custom data structures, and the final assembly
 
 ---
 

@@ -3,7 +3,7 @@ title = "Aryavarth: Distributed Key Value Store Part 1"
 date = 2025-02-05
 [taxonomies]
 tags = ["rust", "distributed-systems", "storage"]
-categories = ["programming"]
+categories = ["rust", "systems"]
 +++
 
 # Aryavarth: Distributed Key Value Store - Part 1
@@ -18,10 +18,10 @@ NOTE: This is Part 1 of a technical deep-dive into Aryavarth, a distributed key-
 
 ## What This Post Covers
 
-* **Part I: The Foundation** - Understanding log-structured storage and why append-only is revolutionary
-* **Part II: The Index Problem** - Building an in-memory index that makes reads fast
-* **Part III: The Compaction Challenge** - Managing disk space without losing data
-* **Part IV: The Complete Architecture** - Putting it all together in Rust
+* **[Part I: The Foundation](/aryavarth-part-1/#part-i-the-foundation)** - Understanding log-structured storage and why append-only is revolutionary
+* **[Part II: The Index Problem](/aryavarth-part-1/#part-ii-the-index-problem)** - Building an in-memory index that makes reads fast
+* **[Part III: The Compaction Challenge](/aryavarth-part-1/#part-iii-the-compaction-challenge)** - Managing disk space without losing data
+* **[Part IV: The Complete Architecture](/aryavarth-part-1/#part-iv-the-complete-architecture)** - Putting it all together in Rust
 
 ---
 
