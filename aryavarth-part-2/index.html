@@ -1,0 +1,1173 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Enable responsiveness on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+      
+        <meta name="description" content="Personal blog about programming and tech" />
+        <meta property="og:description" content="Personal blog about programming and tech" />
+        <meta property="twitter:description" content="Personal blog about programming and tech" />
+      
+    
+
+    <!-- Title -->
+    
+      
+    
+    <title>
+    
+    Aryavarth: Distributed Key Value Store Part 2
+    
+</title>
+
+    <!-- Additional Facebook Meta Tags -->
+    <meta property="og:site_name" content="YGN&#x27;s Blog" />
+    <meta
+      property="og:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;aryavarth-part-2&#x2F;"
+    />
+    <meta
+      property="og:type"
+      content="article"
+    />
+    <meta property="og:title" content="Aryavarth: Distributed Key Value Store Part 2" />
+
+    <!-- Additional Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;aryavarth-part-2&#x2F;"
+    />
+    <meta name="twitter:title" content="Aryavarth: Distributed Key Value Store Part 2" />
+
+    <!-- Additional Fediverse Tags -->
+     
+
+    <!-- Cover images -->
+    
+    
+
+    <meta
+      property="og:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <meta
+      name="twitter:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <!-- Favicons -->
+    
+    <link
+      rel="icon"
+      type="image/png"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.svg"
+    />
+    <link
+      rel="shortcut icon"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.ico"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Aryavarth: Distributed Key Value Store Part 2" />
+    <link
+      rel="manifest"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/site.webmanifest"
+    />
+    
+
+    <!-- RSS Feed -->
+    
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="RSS"
+      href="https://ygndotgg.github.io/atom.xml"
+    />
+    
+
+    <!-- Load Styles -->
+    
+      <link
+        rel="stylesheet"
+        href="https://ygndotgg.github.io/site.css"
+      />
+    
+
+    <!-- Syntax highlighting theming (giallo) -->
+    <link id="giallo-dark" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-dark.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link id="giallo-light" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-light.css"
+      media="(prefers-color-scheme: light)"
+    />
+
+    <!-- Load Fonts -->
+    
+
+  
+
+
+
+
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
+
+
+
+<!-- Forcing Font -->
+<style>
+body {
+  font-family:
+    "JetBrains Mono", Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New,
+    monospace, serif !important;
+}
+</style>
+
+
+    <!-- Pass Theme Preference as Data Attribute -->
+    <script src="https://ygndotgg.github.io/js/init-theme.js"></script>
+
+    <!-- Additional scripts -->
+    
+      
+      
+        <script src="https://ygndotgg.github.io/js/toggle-theme.js"></script>
+      
+      
+
+      
+  <script type="text/javascript" src="https://ygndotgg.github.io/elasticlunr.min.js"></script>
+  <script type="text/javascript" src="https://ygndotgg.github.io/js/search.js"></script>
+
+
+    
+  </head>
+
+  <!-- Body element (contents of the page) -->
+  <body class="hack main container">
+    
+  
+    
+    
+      
+  
+  <section class="nav-header">
+    <nav
+      itemscope
+      itemtype="http://schema.org/SiteNavigationElement"
+      class="navbar"
+    >
+      <section class="nav-links">
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io"
+        >
+          <span itemprop="name">Home</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/categories"
+        >
+          <span itemprop="name">Categories</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/tags"
+        >
+          <span itemprop="name">Tags</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://gaganyt.vercel.app"
+        >
+          <span itemprop="name">Portfolio</span>
+        </a>
+        
+      </section>
+    </nav>
+    <aside class="user-actions-container">
+      
+      <section class="search-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          class="search-icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input type="text" id="search" placeholder="Search..." />
+        <img
+          src="https://ygndotgg.github.io/icons/slash-square.svg"
+          id="slash-icon"
+          class="slash-icon"
+          alt="Press / to search"
+        />
+      </section>
+       
+      <a id="dark-mode-toggle" href="#">
+        <img
+          src="https://ygndotgg.github.io/icons/sun.svg"
+          id="sun-icon"
+          class="invert-icon"
+          alt="Light mode"
+        />
+        <img
+          src="https://ygndotgg.github.io/icons/moon.svg"
+          id="moon-icon"
+          alt="Dark mode"
+        />
+      </a>
+       
+      <a
+        href="https://ygndotgg.github.io/atom.xml"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/rss.svg"
+          id="rss-icon"
+          alt="RSS feed"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;github.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/github.svg"
+          id="github-icon"
+          alt="GitHub"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;x.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/mastodon.svg"
+          id="mastodon-icon"
+          alt="Mastodon"
+          class="social-icon"
+        />
+      </a>
+      
+    </aside>
+  </section>
+  
+  <!-- Search modal overlay and results (positioned globally) -->
+  <section class="search-backdrop"></section>
+  <dialog class="search-results" aria-live="polite">
+    <article class="search-modal-header">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        class="search-modal-icon"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        />
+      </svg>
+      <input type="text" id="search-modal" placeholder="Search..." />
+    </article>
+    <article class="search-results-count" id="search-results-count"></article>
+    <article class="search-results__items" role="list"></article>
+    <footer class="search-modal-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+      <span><kbd>↵ </kbd> to select</span>
+      <span><kbd>esc</kbd> to close</span>
+    </footer>
+  </dialog>
+  
+  
+
+    
+
+
+    <main>
+      
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">Aryavarth: Distributed Key Value Store Part 2</h1>
+        <data class="muted">
+    <svg class="icon i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <data>5 minute read</data>
+    <svg class="icon i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2025-02-10
+</data>
+    </header>
+
+    <article itemprop="articleBody">
+        
+            <!-- If no summary separate from content, just render content -->
+            <h1 id="aryavarth-distributed-key-value-store-part-2">Aryavarth: Distributed Key Value Store - Part 2</h1>
+<h2 id="part-2-the-networking-layer-lock-free-concurrency">Part 2: The Networking Layer &amp; Lock-Free Concurrency</h2>
+<hr />
+<h3 id="prologue-from-library-to-network-service">Prologue: From Library to Network Service</h3>
+<p>In <a href="/aryavarth1">Part 1</a>, we built a <strong>single-process key-value store</strong>. It worked beautifully within one application. But a database that lives only in one process is just a library—not a service.</p>
+<p>For the complete code implementation, see <a rel="external" href="https://github.com/ygndotgg/kvs_store">src/kvs.rs</a>. Check the commit history for the actual implementation details.</p>
+<p>Real distributed systems need <strong>networking</strong>. Multiple clients, across multiple machines, talking to a shared data store. That's where the real engineering begins.</p>
+<p>This is Part 2: where we transform our local KvStore into a <strong>networked, concurrent, distributed key-value store</strong>.</p>
+<hr />
+<h2 id="what-this-post-covers">What This Post Covers</h2>
+<p><strong><a href="/aryavarth-part-2/#part-i-the-networking-layer">Part I: The Networking Layer</a></strong> - TCP servers, Rust async, and turning a library into a service</p>
+<p><strong><a href="/aryavarth-part-2/#part-ii-thread-safety">Part II: Thread Safety</a></strong> - Mutexes, locks, and the challenges of concurrent access</p>
+<p><strong><a href="/aryavarth-part-2/#part-iii-lock-free-concurrency">Part III: Lock-Free Concurrency</a></strong> - Atomic operations, lock-free data structures, and performance</p>
+<p><strong><a href="/aryavarth-part-2/#part-iv-the-complete-architecture">Part IV: The Complete Architecture</a></strong> - Putting it all together in Rust</p>
+<hr />
+<h2 id="section-i-the-network-protocol">Section I: The Network Protocol</h2>
+<h3 id="chapter-1-designing-the-communication-contract">Chapter 1: Designing the Communication Contract</h3>
+<p>Before writing a single line of networking code, we need a <strong>protocol</strong>. What do clients send? What do servers return?</p>
+<h4 id="the-request-response-model">The Request-Response Model</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Client                                                  Server</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │───────── Request: Set(&quot;user:1&quot;, &quot;Alice&quot;) ──────────►│</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │◄──────── Response: Ok(None) ─────────────────────────│</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │───────── Request: Get(&quot;user:1&quot;) ───────────────────►│</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │◄──────── Response: Ok(Some(&quot;Alice&quot;)) ───────────────│</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │───────── Request: Remove(&quot;user:1&quot;) ────────────────►│</span></span>
+<span class="giallo-l"><span>   │                                                       │</span></span>
+<span class="giallo-l"><span>   │◄──────── Response: Ok(None) ─────────────────────────│</span></span></code></pre><h4 id="the-wire-format">The Wire Format</h4>
+<p>We use <strong>JSON over TCP</strong>—simple, debuggable, and human-readable:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#[derive(Serialize, Deserialize, Debug)]</span></span>
+<span class="giallo-l"><span>pub enum Request {</span></span>
+<span class="giallo-l"><span>    Set { key: String, value: String },</span></span>
+<span class="giallo-l"><span>    Get { key: String },</span></span>
+<span class="giallo-l"><span>    Remove { key: String },</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#[derive(Serialize, Deserialize, Debug)]</span></span>
+<span class="giallo-l"><span>pub enum Response {</span></span>
+<span class="giallo-l"><span>    Ok(Option&lt;String&gt;),  // Success: returns value for Get, nothing for Set/Remove</span></span>
+<span class="giallo-l"><span>    Err(String),         // Failure: error message</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Why this design?</strong></p>
+<ul>
+<li><code>Option&lt;String&gt;</code> for success handles the "key not found" case elegantly</li>
+<li><code>Err(String)</code> carries human-readable error messages</li>
+<li>Enum variants become JSON objects: <code>{"Set":{"key":"user:1","value":"Alice"}}</code></li>
+</ul>
+<hr />
+<h3 id="chapter-2-the-client-implementation">Chapter 2: The Client Implementation</h3>
+<p>The client is the ** ambassador** between the application and the server. It must be:</p>
+<ol>
+<li><strong>Connection-aware</strong>: Establish and maintain TCP connections</li>
+<li><strong>Protocol-compliant</strong>: Serialize requests, deserialize responses</li>
+<li><strong>Error-resistant</strong>: Handle network failures gracefully</li>
+</ol>
+<h4 id="the-kvsclient-structure">The KvsClient Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::net::TcpStream;</span></span>
+<span class="giallo-l"><span>use std::io::{Read, Write};</span></span>
+<span class="giallo-l"><span>use std::result::Result;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub struct KvsClient {</span></span>
+<span class="giallo-l"><span>    stream: TcpStream,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl KvsClient {</span></span>
+<span class="giallo-l"><span>    /// Connect to a KVS server at the given address</span></span>
+<span class="giallo-l"><span>    pub fn connect(addr: &amp;str) -&gt; Result&lt;Self&gt; {</span></span>
+<span class="giallo-l"><span>        let stream = TcpStream::connect(addr)?;</span></span>
+<span class="giallo-l"><span>        stream.shutdown(Shutdown::Write)?;  // We&#39;ll signal &quot;done sending&quot; explicitly</span></span>
+<span class="giallo-l"><span>        Ok(KvsClient { stream })</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Send a Set request: key → value</span></span>
+<span class="giallo-l"><span>    pub fn set(&amp;mut self, key: String, value: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        let request = Request::Set { key, value };</span></span>
+<span class="giallo-l"><span>        self.send_request(request)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Send a Get request: retrieve value by key</span></span>
+<span class="giallo-l"><span>    pub fn get(&amp;mut self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt; {</span></span>
+<span class="giallo-l"><span>        let request = Request::Get { key };</span></span>
+<span class="giallo-l"><span>        self.send_request(request)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Send a Remove request: delete a key</span></span>
+<span class="giallo-l"><span>    pub fn remove(&amp;mut self, key: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        let request = Request::Remove { key };</span></span>
+<span class="giallo-l"><span>        self.send_request(request)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Core: serialize request, send, deserialize response</span></span>
+<span class="giallo-l"><span>    fn send_request&lt;R: Serialize&gt;(&amp;mut self, request: R) -&gt; Result&lt;Response&gt; {</span></span>
+<span class="giallo-l"><span>        let mut serializer = serde_json::Serializer::new(&amp;mut self.stream);</span></span>
+<span class="giallo-l"><span>        request.serialize(&amp;mut serializer)?;</span></span>
+<span class="giallo-l"><span>        self.stream.shutdown(Shutdown::Write)?;  // Signal request complete</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        let response: Response = serde_json::from_reader(&amp;mut self.stream)?;</span></span>
+<span class="giallo-l"><span>        Ok(response)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h4 id="the-client-flow-in-action">The Client Flow in Action</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Usage example:</span></span>
+<span class="giallo-l"><span>let mut client = KvsClient::connect(&quot;127.0.0.1:5000&quot;)?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>client.set(&quot;user:42&quot;.into(), &quot;Aryavarth&quot;.into())?;</span></span>
+<span class="giallo-l"><span>println!(&quot;Set user:42 = Aryavarth&quot;);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let value = client.get(&quot;user:42&quot;.into())?;</span></span>
+<span class="giallo-l"><span>println!(&quot;Got: {:?}&quot;, value);  // Some(&quot;Aryavarth&quot;)</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>client.remove(&quot;user:42&quot;.into())?;</span></span>
+<span class="giallo-l"><span>println!(&quot;Removed user:42&quot;);</span></span></code></pre>
+<p><strong>Key insight:</strong> The <code>shutdown(Write)</code> call signals end-of-request. The server knows when to stop reading and start processing.</p>
+<hr />
+<h3 id="chapter-3-the-server-architecture">Chapter 3: The Server Architecture</h3>
+<p>The server is where <strong>complexity lives</strong>. It must:</p>
+<ol>
+<li><strong>Accept connections</strong> from multiple clients simultaneously</li>
+<li><strong>Route requests</strong> to the appropriate handler</li>
+<li><strong>Execute operations</strong> on the underlying KvStore engine</li>
+<li><strong>Return responses</strong> back to clients</li>
+</ol>
+<h4 id="the-kvserver-structure">The KvServer Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::net::{TcpListener, TcpStream};</span></span>
+<span class="giallo-l"><span>use std::sync::Arc;</span></span>
+<span class="giallo-l"><span>use std::io::{Read, Write};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub struct KvServer&lt;E, P&gt;</span></span>
+<span class="giallo-l"><span>where</span></span>
+<span class="giallo-l"><span>    E: KvsEngine,           // Any engine: KvStore or SledKvsEngine</span></span>
+<span class="giallo-l"><span>    P: ThreadPool,         // Any pool: Naive, SharedQueue, or Rayon</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    engine: Arc&lt;E&gt;,        // The data store (cloned for each request)</span></span>
+<span class="giallo-l"><span>    pool: P,               // Thread pool for concurrency</span></span>
+<span class="giallo-l"><span>    listener: TcpListener, // Network listener</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl&lt;E, P&gt; KvServer&lt;E, P&gt;</span></span>
+<span class="giallo-l"><span>where</span></span>
+<span class="giallo-l"><span>    E: KvsEngine + Clone,</span></span>
+<span class="giallo-l"><span>    P: ThreadPool,</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    /// Create a new server bound to the given address</span></span>
+<span class="giallo-l"><span>    pub fn new(addr: &amp;str, engine: E, pool: P) -&gt; Result&lt;Self&gt; {</span></span>
+<span class="giallo-l"><span>        let listener = TcpListener::bind(addr)?;</span></span>
+<span class="giallo-l"><span>        listener.nonblocking()?;  // Non-blocking for better concurrency</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        Ok(KvServer {</span></span>
+<span class="giallo-l"><span>            engine: Arc::new(engine),</span></span>
+<span class="giallo-l"><span>            pool,</span></span>
+<span class="giallo-l"><span>            listener,</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Run the server: accept connections and process requests</span></span>
+<span class="giallo-l"><span>    pub fn run(&amp;self) -&gt; ! {</span></span>
+<span class="giallo-l"><span>        loop {</span></span>
+<span class="giallo-l"><span>            match self.listener.accept() {</span></span>
+<span class="giallo-l"><span>                Ok((stream, addr)) =&gt; {</span></span>
+<span class="giallo-l"><span>                    let engine = self.engine.clone();</span></span>
+<span class="giallo-l"><span>                    self.pool.spawn(move || {</span></span>
+<span class="giallo-l"><span>                        if let Err(e) = handle_connection(stream, engine) {</span></span>
+<span class="giallo-l"><span>                            eprintln!(&quot;Error handling {}: {}&quot;, addr, e);</span></span>
+<span class="giallo-l"><span>                        }</span></span>
+<span class="giallo-l"><span>                    });</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>                Err(e) =&gt; {</span></span>
+<span class="giallo-l"><span>                    // No connection waiting, do other work or yield</span></span>
+<span class="giallo-l"><span>                    std::thread::sleep(std::time::Duration::from_millis(1));</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h4 id="request-handler-the-request-processor">Request Handler: The Request Processor</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::io::{BufReader, BufWriter};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn handle_connection&lt;E: KvsEngine&gt;(</span></span>
+<span class="giallo-l"><span>    stream: TcpStream,</span></span>
+<span class="giallo-l"><span>    engine: E,</span></span>
+<span class="giallo-l"><span>) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>    let reader = BufReader::new(&amp;stream);</span></span>
+<span class="giallo-l"><span>    let mut writer = BufWriter::new(&amp;stream);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Read one request per connection (HTTP-style, not persistent)</span></span>
+<span class="giallo-l"><span>    let request: Request = serde_json::from_reader(reader)?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let response = match request {</span></span>
+<span class="giallo-l"><span>        Request::Set { key, value } =&gt; {</span></span>
+<span class="giallo-l"><span>            engine.set(key, value)?;</span></span>
+<span class="giallo-l"><span>            Response::Ok(None)</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        Request::Get { key } =&gt; {</span></span>
+<span class="giallo-l"><span>            let value = engine.get(key)?;</span></span>
+<span class="giallo-l"><span>            Response::Ok(value)</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        Request::Remove { key } =&gt; {</span></span>
+<span class="giallo-l"><span>            engine.remove(key)?;</span></span>
+<span class="giallo-l"><span>            Response::Ok(None)</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    serde_json::to_writer(&amp;mut writer, &amp;response)?;</span></span>
+<span class="giallo-l"><span>    writer.flush()?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    Ok(())</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<hr />
+<h3 id="chapter-4-the-thread-pool-problem">Chapter 4: The Thread Pool Problem</h3>
+<p>A server that handles <strong>one request at a time</strong> is useless. We need <strong>concurrency</strong>. But how?</p>
+<h4 id="the-thread-lifecycle">The Thread Lifecycle</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Traditional Model:</span></span>
+<span class="giallo-l"><span>                    ┌─────────────┐</span></span>
+<span class="giallo-l"><span>    Request 1 ─────►│   Thread    │────► Process ─────► Response</span></span>
+<span class="giallo-l"><span>                    └─────────────┘</span></span>
+<span class="giallo-l"><span>                    </span></span>
+<span class="giallo-l"><span>    Request 2 ─────►│   Thread    │────► Process ─────► Response</span></span>
+<span class="giallo-l"><span>                    └─────────────┘</span></span>
+<span class="giallo-l"><span>                    </span></span>
+<span class="giallo-l"><span>    Request 3 ─────►│   Thread    │────► Process ─────► Response</span></span>
+<span class="giallo-l"><span>                    └─────────────┘</span></span>
+<span class="giallo-l"><span>                    </span></span>
+<span class="giallo-l"><span>Problem: Unlimited threads = memory explosion + context switching hell</span></span></code></pre><h4 id="attempt-1-naive-thread-pool">Attempt 1: Naive Thread Pool</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub struct NaiveThreadPool;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl ThreadPool for NaiveThreadPool {</span></span>
+<span class="giallo-l"><span>    fn spawn&lt;F&gt;(&amp;self, job: F)</span></span>
+<span class="giallo-l"><span>    where</span></span>
+<span class="giallo-l"><span>        F: FnOnce() + Send + &#39;static,</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>        std::thread::spawn(job);  // Create a new thread for EVERY job!</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Problem:</strong> 10,000 concurrent requests = 10,000 threads = system collapse.</p>
+<h4 id="attempt-2-shared-queue-thread-pool">Attempt 2: Shared Queue Thread Pool</h4>
+<p>The solution: <strong>one pool of worker threads</strong> pulling from a <strong>shared queue</strong>.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::sync::mpsc;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub struct SharedQueueThreadPool {</span></span>
+<span class="giallo-l"><span>    sender: mpsc::Sender&lt;Message&gt;,</span></span>
+<span class="giallo-l"><span>    workers: Vec&lt;Worker&gt;,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>enum Message {</span></span>
+<span class="giallo-l"><span>    Job(Box&lt;dyn FnOnce() + Send + &#39;static&gt;),</span></span>
+<span class="giallo-l"><span>    Terminate,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl SharedQueueThreadPool {</span></span>
+<span class="giallo-l"><span>    pub fn new(threads: u32) -&gt; Result&lt;Self&gt; {</span></span>
+<span class="giallo-l"><span>        let (sender, receiver) = mpsc::channel();</span></span>
+<span class="giallo-l"><span>        let receiver = Arc::new(Mutex::new(receiver));</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        let mut workers = Vec::with_capacity(threads as usize);</span></span>
+<span class="giallo-l"><span>        for _ in 0..threads {</span></span>
+<span class="giallo-l"><span>            workers.push(Worker::new(Arc::clone(&amp;receiver)));</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        Ok(SharedQueueThreadPool { sender, workers })</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl ThreadPool for SharedQueueThreadPool {</span></span>
+<span class="giallo-l"><span>    fn spawn&lt;F&gt;(&amp;self, job: F)</span></span>
+<span class="giallo-l"><span>    where</span></span>
+<span class="giallo-l"><span>        F: FnOnce() + Send + &#39;static,</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>        self.sender.send(Message::Job(Box::new(job))).unwrap();</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>How it works:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>                          ┌──────────────────┐</span></span>
+<span class="giallo-l"><span>    Job (FnOnce) ────────►│   mpsc::Sender   │</span></span>
+<span class="giallo-l"><span>                          └────────┬─────────┘</span></span>
+<span class="giallo-l"><span>                                   │</span></span>
+<span class="giallo-l"><span>                                   ▼</span></span>
+<span class="giallo-l"><span>                          ┌──────────────────┐</span></span>
+<span class="giallo-l"><span>                          │   mpsc::Receiver │</span></span>
+<span class="giallo-l"><span>                          │   (protected by  │</span></span>
+<span class="giallo-l"><span>                          │      Mutex)       │</span></span>
+<span class="giallo-l"><span>                          └────────┬─────────┘</span></span>
+<span class="giallo-l"><span>                                   │</span></span>
+<span class="giallo-l"><span>              ┌────────────────────┼────────────────────┐</span></span>
+<span class="giallo-l"><span>              ▼                    ▼                    ▼</span></span>
+<span class="giallo-l"><span>       ┌────────────┐      ┌────────────┐      ┌────────────┐</span></span>
+<span class="giallo-l"><span>       │  Worker 1   │      │  Worker 2  │      │  Worker N  │</span></span>
+<span class="giallo-l"><span>       │  pop job   │      │  pop job   │      │  pop job   │</span></span>
+<span class="giallo-l"><span>       │  execute   │      │  execute   │      │  execute   │</span></span>
+<span class="giallo-l"><span>       └────────────┘      └────────────┘      └────────────┘</span></span></code></pre><h4 id="attempt-3-rayon-thread-pool-work-stealing">Attempt 3: Rayon Thread Pool (Work-Stealing)</h4>
+<p>For CPU-intensive workloads, Rayon provides <strong>work-stealing</strong>—workers steal jobs from each other when idle:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub struct RayonThreadPool {</span></span>
+<span class="giallo-l"><span>    pool: rayon::ThreadPool,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl ThreadPool for RayonThreadPool {</span></span>
+<span class="giallo-l"><span>    fn new(threads: u32) -&gt; Result&lt;Self&gt; {</span></span>
+<span class="giallo-l"><span>        let pool = rayon::ThreadPoolBuilder::new()</span></span>
+<span class="giallo-l"><span>            .num_threads(threads as usize)</span></span>
+<span class="giallo-l"><span>            .build()?;</span></span>
+<span class="giallo-l"><span>        Ok(RayonThreadPool { pool })</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fn spawn&lt;F&gt;(&amp;self, job: F)</span></span>
+<span class="giallo-l"><span>    where</span></span>
+<span class="giallo-l"><span>        F: FnOnce() + Send + &#39;static,</span></span>
+<span class="giallo-l"><span>    {</span></span>
+<span class="giallo-l"><span>        self.pool.spawn(job);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>When to use which:</strong></p>
+<table><thead><tr><th>Pool Type</th><th>Best For</th><th>Weakness</th></tr></thead><tbody>
+<tr><td>Naive</td><td>Learning, trivial loads</td><td>Memory explosion</td></tr>
+<tr><td>SharedQueue</td><td>I/O-bound workloads</td><td>Single channel bottleneck</td></tr>
+<tr><td>Rayon</td><td>CPU-bound parallelism</td><td>Not ideal for waiting on I/O</td></tr>
+</tbody></table>
+<hr />
+<h2 id="section-ii-the-engine-abstraction">Section II: The Engine Abstraction</h2>
+<h3 id="chapter-5-why-one-engine-is-not-enough">Chapter 5: Why One Engine Is Not Enough</h3>
+<p>Our KvStore is custom-built with append-only logs. But what if we want to compare against <strong>industry-standard engines</strong> like Sled?</p>
+<h4 id="the-problem-tight-coupling">The Problem: Tight Coupling</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Before: Server only knows about KvStore</span></span>
+<span class="giallo-l"><span>pub struct KvServer {</span></span>
+<span class="giallo-l"><span>    store: KvStore,  // Hardcoded!</span></span>
+<span class="giallo-l"><span>    // ...</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h4 id="the-solution-trait-based-abstraction">The Solution: Trait-Based Abstraction</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub trait KvsEngine: Clone + Send + &#39;static {</span></span>
+<span class="giallo-l"><span>    /// Set a key-value pair</span></span>
+<span class="giallo-l"><span>    fn set(&amp;self, key: String, value: String) -&gt; Result&lt;()&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Get a value by key</span></span>
+<span class="giallo-l"><span>    fn get(&amp;self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt;;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    /// Remove a key</span></span>
+<span class="giallo-l"><span>    fn remove(&amp;self, key: String) -&gt; Result&lt;()&gt;;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Now the server is <strong>generic</strong>:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub struct KvServer&lt;E, P&gt;</span></span>
+<span class="giallo-l"><span>where</span></span>
+<span class="giallo-l"><span>    E: KvsEngine,    // Any engine that implements our trait</span></span>
+<span class="giallo-l"><span>    P: ThreadPool,</span></span>
+<span class="giallo-l"><span>{</span></span>
+<span class="giallo-l"><span>    engine: Arc&lt;E&gt;,</span></span>
+<span class="giallo-l"><span>    pool: P,</span></span>
+<span class="giallo-l"><span>    listener: TcpListener,</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h4 id="implementing-for-custom-kvstore">Implementing for Custom KvStore</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>impl KvsEngine for KvStore {</span></span>
+<span class="giallo-l"><span>    fn set(&amp;self, key: String, value: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        self.inner.lock().unwrap().set(key, value)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fn get(&amp;self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt; {</span></span>
+<span class="giallo-l"><span>        self.inner.lock().unwrap().get(key)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fn remove(&amp;self, key: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        self.inner.lock().unwrap().remove(key)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h4 id="implementing-for-sled">Implementing for Sled</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use sled::Db;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub struct SledKvsEngine {</span></span>
+<span class="giallo-l"><span>    db: Db,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl KvsEngine for SledKvsEngine {</span></span>
+<span class="giallo-l"><span>    fn set(&amp;self, key: String, value: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        self.db.insert(key.as_bytes(), value.as_bytes())?;</span></span>
+<span class="giallo-l"><span>        self.db.flush()?;  // Ensure durability</span></span>
+<span class="giallo-l"><span>        Ok(())</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fn get(&amp;self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt; {</span></span>
+<span class="giallo-l"><span>        Ok(self.db</span></span>
+<span class="giallo-l"><span>            .get(key.as_bytes())?</span></span>
+<span class="giallo-l"><span>            .map(|v| String::from_utf8_lossy(&amp;v).into_owned()))</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    fn remove(&amp;self, key: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        self.db.remove(key.as_bytes())?;</span></span>
+<span class="giallo-l"><span>        self.db.flush()?;</span></span>
+<span class="giallo-l"><span>        Ok(())</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>The beauty:</strong> The server code never changes. Only the engine instantiation changes:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Using custom KvStore</span></span>
+<span class="giallo-l"><span>let engine = KvStore::open(&quot;./data&quot;)?;</span></span>
+<span class="giallo-l"><span>let server = KvServer::new(&quot;127.0.0.1:5000&quot;, engine, pool);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Using Sled</span></span>
+<span class="giallo-l"><span>let engine = SledKvsEngine::new(&quot;./sled_data&quot;)?;</span></span>
+<span class="giallo-l"><span>let server = KvServer::new(&quot;127.0.0.1:5000&quot;, engine, pool);</span></span></code></pre>
+<hr />
+<h2 id="section-iii-the-lock-free-revolution">Section III: The Lock-Free Revolution</h2>
+<h3 id="chapter-6-the-concurrency-crisis">Chapter 6: The Concurrency Crisis</h3>
+<p>We've solved <strong>network concurrency</strong> with thread pools. But there's another concurrency problem: <strong>data access concurrency</strong>.</p>
+<h4 id="the-mutex-bottleneck">The Mutex Bottleneck</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub struct KvStore {</span></span>
+<span class="giallo-l"><span>    inner: Mutex&lt;KvStoreInner&gt;,  // One lock to rule them all</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>What happens:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Thread 1 (Reader):  [=========LOCK=========.....get().....]</span></span>
+<span class="giallo-l"><span>Thread 2 (Reader):                    [=========LOCK=========.....get().....]</span></span>
+<span class="giallo-l"><span>Thread 3 (Writer):                                        [=========LOCK=========.....set().....]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Problem: Even READERS block each other!</span></span></code></pre><h4 id="the-rwlock-attempt">The RwLock Attempt</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub struct KvStore {</span></span>
+<span class="giallo-l"><span>    inner: RwLock&lt;KvStoreInner&gt;,  // Multiple readers allowed</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Better, but still problematic:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Thread 1 (Reader):  [===READ===.....get().....]</span></span>
+<span class="giallo-l"><span>Thread 2 (Reader):  [===READ===.....get().....]  ✓ Concurrent reads!</span></span>
+<span class="giallo-l"><span>Thread 3 (Writer):              [===WRITE===.....set().....]</span></span>
+<span class="giallo-l"><span>Thread 4 (Reader):                          [---BLOCKED---]</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Problem: BufReader needs &amp;mut for seek(), but RwLock gives &amp;T!</span></span></code></pre>
+<p><strong>The fundamental trap:</strong> You get shared access (<code>&amp;T</code>) but file operations need exclusive access (<code>&amp;mut T</code>).</p>
+<hr />
+<h3 id="chapter-7-breaking-the-monolith">Chapter 7: Breaking the Monolith</h3>
+<p>The insight: <strong>don't share everything</strong>. Some things should be shared; others should be <strong>instantiated fresh per-operation</strong>.</p>
+<h4 id="before-one-giant-lock">Before: One Giant Lock</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                     Mutex&lt;KvStoreInner&gt;                      │</span></span>
+<span class="giallo-l"><span>│  ┌───────────────────────────────────────────────────────┐ │</span></span>
+<span class="giallo-l"><span>│  │  path: PathBuf                                         │ │</span></span>
+<span class="giallo-l"><span>│  │  index: HashMap&lt;String, LogPointer&gt;                    │ │</span></span>
+<span class="giallo-l"><span>│  │  writer: BufWriter                                     │ │</span></span>
+<span class="giallo-l"><span>│  │  reader: HashMap&lt;u64, BufReader&gt;                       │ │</span></span>
+<span class="giallo-l"><span>│  │  current_file_id: u64                                  │ │</span></span>
+<span class="giallo-l"><span>│  └───────────────────────────────────────────────────────┘ │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────┘</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>All synchronized together = maximum contention</span></span></code></pre><h4 id="after-field-level-synchronization">After: Field-Level Synchronization</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                       KvStore (Clone-safe)                   │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│  path:              Arc&lt;PathBuf&gt;      ← immutable, shared   │</span></span>
+<span class="giallo-l"><span>│  index:             Arc&lt;SkipMap&lt;...&gt;&gt;← lock-free, shared    │</span></span>
+<span class="giallo-l"><span>│  writer:            Arc&lt;Mutex&lt;...&gt;&gt;  ← write-only, shared   │</span></span>
+<span class="giallo-l"><span>│  current_file_id:   Arc&lt;AtomicU64&gt;   ← lock-free counter    │</span></span>
+<span class="giallo-l"><span>│  reader:            REMOVED          ← open fresh each time │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────┘</span></span></code></pre><h4 id="the-new-lock-free-structure">The New Lock-Free Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::sync::atomic::{AtomicU64, Ordering};</span></span>
+<span class="giallo-l"><span>use crossbeam::sync::SkipMap;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#[derive(Clone)]</span></span>
+<span class="giallo-l"><span>pub struct KvStore {</span></span>
+<span class="giallo-l"><span>    path: Arc&lt;PathBuf&gt;,                              // Immutable after creation</span></span>
+<span class="giallo-l"><span>    index: Arc&lt;SkipMap&lt;String, LogPointer&gt;&gt;,        // Lock-free concurrent map</span></span>
+<span class="giallo-l"><span>    writer: Arc&lt;Mutex&lt;WriterState&gt;&gt;,                // Serialize writes only</span></span>
+<span class="giallo-l"><span>    current_file_id: Arc&lt;AtomicU64&gt;,                // Lock-free counter</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Why each field is different:</strong></p>
+<table><thead><tr><th>Field</th><th>Type</th><th>Why</th></tr></thead><tbody>
+<tr><td><code>path</code></td><td><code>Arc&lt;PathBuf&gt;</code></td><td>Never changes after init</td></tr>
+<tr><td><code>index</code></td><td><code>Arc&lt;SkipMap&gt;</code></td><td>Lock-free reads &amp; writes</td></tr>
+<tr><td><code>writer</code></td><td><code>Arc&lt;Mutex&lt;...&gt;&gt;</code></td><td>Only one writer at a time</td></tr>
+<tr><td><code>file_id</code></td><td><code>Arc&lt;AtomicU64&gt;</code></td><td>Lock-free increment</td></tr>
+</tbody></table>
+<hr />
+<h3 id="chapter-8-the-lock-free-read-path">Chapter 8: The Lock-Free Read Path</h3>
+<p>This is the <strong>crown jewel</strong>—reads that never block.</p>
+<h4 id="the-problem-with-shared-readers">The Problem with Shared Readers</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>OLD: Shared BufReader</span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>     ┌──────────┐      ┌─────────────┐</span></span>
+<span class="giallo-l"><span>     │ Reader 1 │─────►│  BufReader  │◄── Needs &amp;mut for seek()</span></span>
+<span class="giallo-l"><span>     └──────────┘      └──────┬──────┘</span></span>
+<span class="giallo-l"><span>     ┌──────────┐            │</span></span>
+<span class="giallo-l"><span>     │ Reader 2 │────────────┘</span></span>
+<span class="giallo-l"><span>     └──────────┘</span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>     Problem: One seek() blocks everyone!</span></span></code></pre><h4 id="the-solution-own-your-own-handle">The Solution: Own Your Own Handle</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>NEW: Fresh file handle per read</span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>     ┌──────────┐      ┌─────────────┐</span></span>
+<span class="giallo-l"><span>     │ Reader 1 │─────►│ File (own)  │◄── Independent seek()</span></span>
+<span class="giallo-l"><span>     └──────────┘      └─────────────┘</span></span>
+<span class="giallo-l"><span>     ┌──────────┐      ┌─────────────┐</span></span>
+<span class="giallo-l"><span>     │ Reader 2 │─────►│ File (own)  │◄── Independent seek()</span></span>
+<span class="giallo-l"><span>     └──────────┘      └─────────────┘</span></span>
+<span class="giallo-l"><span>     </span></span>
+<span class="giallo-l"><span>     ✓ No sharing = No blocking</span></span></code></pre><h4 id="lock-free-get-implementation">Lock-Free Get Implementation</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>impl KvStore {</span></span>
+<span class="giallo-l"><span>    pub fn get(&amp;self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt; {</span></span>
+<span class="giallo-l"><span>        // Step 1: Get pointer from SkipMap (lock-free!)</span></span>
+<span class="giallo-l"><span>        let log_ptr = match self.index.get(&amp;key) {</span></span>
+<span class="giallo-l"><span>            Some(ptr) =&gt; ptr,</span></span>
+<span class="giallo-l"><span>            None =&gt; return Ok(None),  // Key doesn&#39;t exist</span></span>
+<span class="giallo-l"><span>        };</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Step 2: Open fresh file handle (no sharing!)</span></span>
+<span class="giallo-l"><span>        let path = self.path.join(format!(&quot;{}.log&quot;, log_ptr.file_id));</span></span>
+<span class="giallo-l"><span>        let file = OpenOptions::new().read(true).open(path)?;</span></span>
+<span class="giallo-l"><span>        let mut reader = BufReader::new(file);</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Step 3: Seek to position and read</span></span>
+<span class="giallo-l"><span>        reader.seek(SeekFrom::Start(log_ptr.offset))?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        let cmd: Command = serde_json::from_reader(reader)?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        match cmd {</span></span>
+<span class="giallo-l"><span>            Command::Set { value, .. } =&gt; Ok(Some(value)),</span></span>
+<span class="giallo-l"><span>            Command::Remove { .. } =&gt; Ok(None),</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>The Timeline:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Lock-Free Reads in Action:</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>Thread 1 (Reader):  [===get(key_a)===........]</span></span>
+<span class="giallo-l"><span>Thread 2 (Reader):  [===get(key_b)===........]  ✓ Never blocked!</span></span>
+<span class="giallo-l"><span>Thread 3 (Writer):  [===set(key_c)===........]</span></span>
+<span class="giallo-l"><span>Thread 4 (Reader):  [===get(key_a)===........]  ✓ Still works!</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>No locks held during reads = maximum parallelism</span></span></code></pre>
+<hr />
+<h3 id="chapter-9-the-skipmap-deep-dive">Chapter 9: The SkipMap Deep Dive</h3>
+<p>HashMap is great, but <strong>not thread-safe</strong>. We need a concurrent map that supports <strong>lock-free reads</strong>.</p>
+<h4 id="why-skipmap">Why SkipMap?</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌────────────────────┬─────────────────────┐</span></span>
+<span class="giallo-l"><span>│      HashMap       │      SkipMap        │</span></span>
+<span class="giallo-l"><span>├────────────────────┼─────────────────────┤</span></span>
+<span class="giallo-l"><span>│ Not thread-safe    │ Lock-free reads     │</span></span>
+<span class="giallo-l"><span>│ Needs external lock│ Lock-free writes    │</span></span>
+<span class="giallo-l"><span>│ O(1) average       │ O(log n)            │</span></span>
+<span class="giallo-l"><span>│ No ordering        │ Range queries       │</span></span>
+<span class="giallo-l"><span>└────────────────────┴─────────────────────┘</span></span></code></pre><h4 id="the-skipmap-api-quirk">The SkipMap API Quirk</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// HashMap style:</span></span>
+<span class="giallo-l"><span>let old = hashmap.insert(key, value);  // Returns old value</span></span>
+<span class="giallo-l"><span>let old = hashmap.get(&amp;key);            // Returns &amp;value</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// SkipMap style:</span></span>
+<span class="giallo-l"><span>let entry = skipmap.insert(key, value); // Returns Entry (the NEW value!)</span></span>
+<span class="giallo-l"><span>let old = skipmap.get(&amp;key);            // But we need the OLD value...</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Workaround: get first, then insert</span></span>
+<span class="giallo-l"><span>let old_value = skipmap.get(&amp;key);</span></span>
+<span class="giallo-l"><span>skipmap.insert(key, new_pointer);</span></span>
+<span class="giallo-l"><span>if let Some(old) = old_value {</span></span>
+<span class="giallo-l"><span>    // Use old pointer for cleanup</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<hr />
+<h3 id="chapter-10-compaction-with-lock-free-readers">Chapter 10: Compaction with Lock-Free Readers</h3>
+<p>Here's the tricky part: <strong>compaction changes file pointers while readers are accessing them</strong>.</p>
+<h4 id="the-race-condition">The Race Condition</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Scenario:</span></span>
+<span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│ Reader:                                                       │</span></span>
+<span class="giallo-l"><span>│   1. index.get(&quot;key&quot;) → LogPointer { file_id: 1, offset: 0 }│</span></span>
+<span class="giallo-l"><span>│                              ▲                               │</span></span>
+<span class="giallo-l"><span>│                              │ Pointer points to file:1      │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│ Compactor:                                                   │</span></span>
+<span class="giallo-l"><span>│   2. Write compacted data to file:2                         │</span></span>
+<span class="giallo-l"><span>│   3. index.insert(&quot;key&quot;, LogPointer { file_id: 2, ... })    │</span></span>
+<span class="giallo-l"><span>│   4. delete(&quot;1.log&quot;)  ← OOPS! Reader was about to read this │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre><h4 id="the-fix-collect-before-updating">The Fix: Collect Before Updating</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>impl KvStore {</span></span>
+<span class="giallo-l"><span>    pub fn compact(&amp;mut self) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        // Step 1: Collect OLD file IDs BEFORE modifying index</span></span>
+<span class="giallo-l"><span>        let mut old_files: Vec&lt;u64&gt; = Vec::new();</span></span>
+<span class="giallo-l"><span>        {</span></span>
+<span class="giallo-l"><span>            let index = self.index.read().unwrap();</span></span>
+<span class="giallo-l"><span>            for (_key, ptr) in index.iter() {</span></span>
+<span class="giallo-l"><span>                if !old_files.contains(&amp;ptr.file_id) {</span></span>
+<span class="giallo-l"><span>                    old_files.push(ptr.file_id);</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Step 2: Write compacted file</span></span>
+<span class="giallo-l"><span>        let compaction_file_id = self.current_file_id.fetch_add(1);</span></span>
+<span class="giallo-l"><span>        let compacted_path = self.path.join(format!(&quot;{}.log&quot;, compaction_file_id));</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // ... write only live entries to new file ...</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Step 3: Update all pointers to new file</span></span>
+<span class="giallo-l"><span>        for (_key, ptr) in self.index.iter() {</span></span>
+<span class="giallo-l"><span>            ptr.file_id = compaction_file_id;</span></span>
+<span class="giallo-l"><span>            // update offsets too...</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Step 4: NOW delete old files (safe!)</span></span>
+<span class="giallo-l"><span>        for file_id in old_files {</span></span>
+<span class="giallo-l"><span>            let path = self.path.join(format!(&quot;{}.log&quot;, file_id));</span></span>
+<span class="giallo-l"><span>            fs::remove_file(path)?;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        Ok(())</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Why this works:</strong> We collected file IDs that <strong>existed when compaction started</strong>. New files created during compaction aren't collected.</p>
+<hr />
+<h3 id="chapter-11-write-serialization">Chapter 11: Write Serialization</h3>
+<p>Even though reads are lock-free, <strong>writes must be serialized</strong>. Only one writer at a time.</p>
+<h4 id="the-writer-state">The Writer State</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>struct WriterState {</span></span>
+<span class="giallo-l"><span>    writer: BufWriter&lt;File&gt;,</span></span>
+<span class="giallo-l"><span>    current_file_id: u64,</span></span>
+<span class="giallo-l"><span>    bytes_in_current_file: u64,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl KvStore {</span></span>
+<span class="giallo-l"><span>    pub fn set(&amp;self, key: String, value: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>        // Serialize access to writer</span></span>
+<span class="giallo-l"><span>        let mut writer = self.writer.lock().unwrap();</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Prepare command</span></span>
+<span class="giallo-l"><span>        let cmd = Command::Set { key: key.clone(), value: value.clone() };</span></span>
+<span class="giallo-l"><span>        let serialized = serde_json::to_string(&amp;cmd)?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Write to log</span></span>
+<span class="giallo-l"><span>        let offset = writer.bytes_in_current_file;</span></span>
+<span class="giallo-l"><span>        writeln!(writer.writer, &quot;{}&quot;, serialized)?;</span></span>
+<span class="giallo-l"><span>        writer.writer.flush()?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Update index with new pointer</span></span>
+<span class="giallo-l"><span>        let ptr = LogPointer {</span></span>
+<span class="giallo-l"><span>            file_id: writer.current_file_id,</span></span>
+<span class="giallo-l"><span>            offset,</span></span>
+<span class="giallo-l"><span>            length: serialized.len() as u64,</span></span>
+<span class="giallo-l"><span>        };</span></span>
+<span class="giallo-l"><span>        self.index.insert(key, ptr);</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        Ok(())</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<hr />
+<h2 id="section-iv-the-complete-architecture">Section IV: The Complete Architecture</h2>
+<h3 id="final-how-it-all-fits-together">Final: How It All Fits Together</h3>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                      Client Applications                         │</span></span>
+<span class="giallo-l"><span>│   ┌──────────┐       ┌──────────┐       ┌──────────┐          │</span></span>
+<span class="giallo-l"><span>│   │  App 1   │       │  App 2   │       │  App N   │          │</span></span>
+<span class="giallo-l"><span>│   └────┬─────┘       └────┬─────┘       └────┬─────┘          │</span></span>
+<span class="giallo-l"><span>│        │                  │                  │                │</span></span>
+<span class="giallo-l"><span>│        ▼                  ▼                  ▼                │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────────┐  │</span></span>
+<span class="giallo-l"><span>│   │                   Network Layer (TCP)                    │  │</span></span>
+<span class="giallo-l"><span>│   │  Request: {Set|Get|Remove} ────► Response: {Ok|Err}   │  │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────────────────┘  │</span></span>
+<span class="giallo-l"><span>│                              │                                   │</span></span>
+<span class="giallo-l"><span>│                              ▼                                   │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────────┐  │</span></span>
+<span class="giallo-l"><span>│   │              Thread Pool (P)                             │  │</span></span>
+<span class="giallo-l"><span>│   │   ┌────────┐  ┌────────┐  ┌────────┐  ┌────────┐      │  │</span></span>
+<span class="giallo-l"><span>│   │   │Worker 1│  │Worker 2│  │Worker 3│  │Worker N│      │  │</span></span>
+<span class="giallo-l"><span>│   │   └────────┘  └────────┘  └────────┘  └────────┘      │  │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────────────────┘  │</span></span>
+<span class="giallo-l"><span>│                              │                                   │</span></span>
+<span class="giallo-l"><span>│                              ▼                                   │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────────┐  │</span></span>
+<span class="giallo-l"><span>│   │            KvsEngine Trait (E)                           │  │</span></span>
+<span class="giallo-l"><span>│   │   fn set(key, value) │ fn get(key) │ fn remove(key)    │  │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────────────────┘  │</span></span>
+<span class="giallo-l"><span>│                    │                         │                  │</span></span>
+<span class="giallo-l"><span>│                    ▼                         ▼                  │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────┐  ┌────────────────────────────┐  │</span></span>
+<span class="giallo-l"><span>│   │      KvStore           │  │     SledKvsEngine          │  │</span></span>
+<span class="giallo-l"><span>│   │  ┌─────────────────┐   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  │ path: Arc&lt;PathBuf&gt;   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  ├─────────────────┤   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  │ index: Arc&lt;SkipMap&gt; │  │    (sled::Db)              │  │</span></span>
+<span class="giallo-l"><span>│   │  ├─────────────────┤   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  │ writer: Arc&lt;Mutex&lt;&gt;&gt;│  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  ├─────────────────┤   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  │ file_id: AtomicU64 │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  └─────────────────┘   │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   │  (Lock-Free Reads!)     │  │                            │  │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────┘  └────────────────────────────┘  │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="epilogue-what-we-ve-built">Epilogue: What We've Built</h3>
+<p><strong>Part 1 recap (local store):</strong></p>
+<ul>
+<li>Append-only log for durability</li>
+<li>In-memory index for fast lookups</li>
+<li>Log compaction for space reclamation</li>
+</ul>
+<p><strong>Part 2 addition (networked, concurrent):</strong></p>
+<ul>
+<li>TCP client-server protocol with JSON serialization</li>
+<li>Thread pool abstraction for concurrent request handling</li>
+<li>Engine trait for swapping implementations (KvStore ↔ Sled)</li>
+<li>Lock-free reads using SkipMap and per-read file handles</li>
+<li>Field-level synchronization instead of global locks</li>
+<li>Atomic counters for lock-free file ID management</li>
+</ul>
+<p><strong>The result:</strong> A distributed key-value store that:</p>
+<ul>
+<li>✓ Serves multiple concurrent clients</li>
+<li>✓ Supports multiple storage engines</li>
+<li>✓ Reads never block other reads</li>
+<li>✓ Writes are properly serialized</li>
+<li>✓ Compacts without disrupting readers</li>
+</ul>
+<hr />
+<p><strong>Next in Part 3:</strong> We'll explore <strong>distributed consensus</strong>, <strong>replication</strong>, and <strong>the Raft protocol</strong> for building truly fault-tolerant distributed systems.</p>
+<hr />
+<p><em>Building a Distributed Key Value Store - Part 2</em><br />
+<a href="/aryavarth1">Part 1: The Persistence Journey</a> | Part 2<br />
+<a rel="external" href="https://github.com/ygndotgg/kvs_store">GitHub</a></p>
+
+        
+    </article>
+
+    <!-- Comment section -->
+    
+      
+        
+          <script
+  src="https://giscus.app/client.js"
+  data-repo="ygndotgg&#x2F;ygndotgg.github.io"
+  data-repo-id="R_kgDORbe62A"
+  data-category="General"
+  data-category-id="DIC_kwDORbe62M4C3cVZ"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+
+  
+  data-theme="preferred_color_scheme"
+  
+
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+
+        
+      
+    
+
+
+    <!-- Page footer -->
+    
+    <footer>
+        <hr>
+        <p>
+            
+            
+                
+                in <a href="https://ygndotgg.github.io/categories/rust/">rust</a>
+            
+            
+                and
+                tagged
+                
+                    <a href="https://ygndotgg.github.io/tags/rust/">rust</a>
+                    
+                        
+                            
+                                ,
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/distributed-systems/">distributed-systems</a>
+                    
+                        
+                            
+                                ,
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/networking/">networking</a>
+                    
+                        
+                            
+                                and
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/concurrency/">concurrency</a>
+                    
+                        
+                    
+                
+            
+        </p>
+
+        <!-- Revision history (optional) -->
+        
+          
+            
+              
+            
+          
+        
+
+        
+        
+    </footer>
+
+
+</article>
+
+
+    </main>
+    
+
+  </body>
+</html>

@@ -1,0 +1,1282 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Enable responsiveness on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+      
+        <meta name="description" content="Personal blog about programming and tech" />
+        <meta property="og:description" content="Personal blog about programming and tech" />
+        <meta property="twitter:description" content="Personal blog about programming and tech" />
+      
+    
+
+    <!-- Title -->
+    
+      
+    
+    <title>
+    
+    brrrc: Processing One Billion Rows in 3.29 Seconds
+    
+</title>
+
+    <!-- Additional Facebook Meta Tags -->
+    <meta property="og:site_name" content="YGN&#x27;s Blog" />
+    <meta
+      property="og:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;1brc&#x2F;"
+    />
+    <meta
+      property="og:type"
+      content="article"
+    />
+    <meta property="og:title" content="brrrc: Processing One Billion Rows in 3.29 Seconds" />
+
+    <!-- Additional Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;1brc&#x2F;"
+    />
+    <meta name="twitter:title" content="brrrc: Processing One Billion Rows in 3.29 Seconds" />
+
+    <!-- Additional Fediverse Tags -->
+     
+
+    <!-- Cover images -->
+    
+    
+
+    <meta
+      property="og:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <meta
+      name="twitter:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <!-- Favicons -->
+    
+    <link
+      rel="icon"
+      type="image/png"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.svg"
+    />
+    <link
+      rel="shortcut icon"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.ico"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="brrrc: Processing One Billion Rows in 3.29 Seconds" />
+    <link
+      rel="manifest"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/site.webmanifest"
+    />
+    
+
+    <!-- RSS Feed -->
+    
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="RSS"
+      href="https://ygndotgg.github.io/atom.xml"
+    />
+    
+
+    <!-- Load Styles -->
+    
+      <link
+        rel="stylesheet"
+        href="https://ygndotgg.github.io/site.css"
+      />
+    
+
+    <!-- Syntax highlighting theming (giallo) -->
+    <link id="giallo-dark" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-dark.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link id="giallo-light" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-light.css"
+      media="(prefers-color-scheme: light)"
+    />
+
+    <!-- Load Fonts -->
+    
+
+  
+
+
+
+
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
+
+
+
+<!-- Forcing Font -->
+<style>
+body {
+  font-family:
+    "JetBrains Mono", Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New,
+    monospace, serif !important;
+}
+</style>
+
+
+    <!-- Pass Theme Preference as Data Attribute -->
+    <script src="https://ygndotgg.github.io/js/init-theme.js"></script>
+
+    <!-- Additional scripts -->
+    
+      
+      
+        <script src="https://ygndotgg.github.io/js/toggle-theme.js"></script>
+      
+      
+
+      
+  <script type="text/javascript" src="https://ygndotgg.github.io/elasticlunr.min.js"></script>
+  <script type="text/javascript" src="https://ygndotgg.github.io/js/search.js"></script>
+
+
+    
+  </head>
+
+  <!-- Body element (contents of the page) -->
+  <body class="hack main container">
+    
+  
+    
+    
+      
+  
+  <section class="nav-header">
+    <nav
+      itemscope
+      itemtype="http://schema.org/SiteNavigationElement"
+      class="navbar"
+    >
+      <section class="nav-links">
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io"
+        >
+          <span itemprop="name">Home</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/categories"
+        >
+          <span itemprop="name">Categories</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/tags"
+        >
+          <span itemprop="name">Tags</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://gaganyt.vercel.app"
+        >
+          <span itemprop="name">Portfolio</span>
+        </a>
+        
+      </section>
+    </nav>
+    <aside class="user-actions-container">
+      
+      <section class="search-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          class="search-icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input type="text" id="search" placeholder="Search..." />
+        <img
+          src="https://ygndotgg.github.io/icons/slash-square.svg"
+          id="slash-icon"
+          class="slash-icon"
+          alt="Press / to search"
+        />
+      </section>
+       
+      <a id="dark-mode-toggle" href="#">
+        <img
+          src="https://ygndotgg.github.io/icons/sun.svg"
+          id="sun-icon"
+          class="invert-icon"
+          alt="Light mode"
+        />
+        <img
+          src="https://ygndotgg.github.io/icons/moon.svg"
+          id="moon-icon"
+          alt="Dark mode"
+        />
+      </a>
+       
+      <a
+        href="https://ygndotgg.github.io/atom.xml"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/rss.svg"
+          id="rss-icon"
+          alt="RSS feed"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;github.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/github.svg"
+          id="github-icon"
+          alt="GitHub"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;x.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/mastodon.svg"
+          id="mastodon-icon"
+          alt="Mastodon"
+          class="social-icon"
+        />
+      </a>
+      
+    </aside>
+  </section>
+  
+  <!-- Search modal overlay and results (positioned globally) -->
+  <section class="search-backdrop"></section>
+  <dialog class="search-results" aria-live="polite">
+    <article class="search-modal-header">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        class="search-modal-icon"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        />
+      </svg>
+      <input type="text" id="search-modal" placeholder="Search..." />
+    </article>
+    <article class="search-results-count" id="search-results-count"></article>
+    <article class="search-results__items" role="list"></article>
+    <footer class="search-modal-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+      <span><kbd>↵ </kbd> to select</span>
+      <span><kbd>esc</kbd> to close</span>
+    </footer>
+  </dialog>
+  
+  
+
+    
+
+
+    <main>
+      
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">brrrc: Processing One Billion Rows in 3.29 Seconds</h1>
+        <data class="muted">
+    <svg class="icon i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <data>8 minute read</data>
+    <svg class="icon i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2025-01-23
+</data>
+    </header>
+
+    <article itemprop="articleBody">
+        
+            <!-- If no summary separate from content, just render content -->
+            <h1 id="brrrc-processing-one-billion-rows-in-3-29-seconds">brrrc: Processing One Billion Rows in 3.29 Seconds</h1>
+<p>"Just use BufferedReader and parse line by line - it'll be fast enough."</p>
+<p>That is what everyone tells you. Read the file, split by lines, parse temperatures, done.</p>
+<p>But honestly, they are WRONG. When you're processing <strong>one billion rows</strong> - that's 13+ GB of data - "fast enough" translates to minutes, not seconds. The difference between a naive solution and an optimized one isn't 2x or 3x - it's <strong>100x or more</strong>.</p>
+<p>NOTE: This is a technical deep-dive into <strong>1brc</strong>, a solution to the One Billion Row Challenge. We will cover memory-mapped I/O, SIMD vectorization, custom hashing, and the incremental optimization journey from ~2 minutes to ~3 seconds.</p>
+<hr />
+<h2 id="what-this-post-covers">What This Post Covers</h2>
+<p><strong><a href="/1brc/#part-i-the-naive-foundation">Part I: The Naive Foundation</a></strong> - BufferedReader, HashMap, and why the obvious approach fails at scale</p>
+<p><strong><a href="/1brc/#part-ii-the-memory-revolution">Part II: The Memory Revolution</a></strong> - Memory-mapped I/O, kernel bypass, and the art of zero-copy</p>
+<p><strong><a href="/1brc/#part-iii-the-parsing-pipeline">Part III: The Parsing Pipeline</a></strong> - Integer arithmetic, memchr, SIMD vectorization</p>
+<p><strong><a href="/1brc/#part-iv-the-architecture">Part IV: The Architecture</a></strong> - Multi-threading, custom data structures, and the final assembly</p>
+<hr />
+<h2 id="performance-snapshot">Performance Snapshot</h2>
+<p><strong>Hardware:</strong></p>
+<ul>
+<li>CPU: Intel Core Ultra 5</li>
+<li>RAM: 16GB</li>
+<li>OS: Omarchy (Arch Linux-based)</li>
+</ul>
+<p><strong>Benchmark Results:</strong></p>
+<ul>
+<li>Final execution time: <strong>~3.29 seconds</strong></li>
+<li>Input: 1 billion rows (~13GB)</li>
+<li>Output: Min/Max/Average for ~400 weather stations</li>
+<li>Flame graph: Available in repository</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>{Abha=-5.0/18.0/39.9, Abidjan=-5.0/26.0/40.0, ...}</span></span></code></pre>
+<hr />
+<h2 id="prologue-the-one-billion-row-problem">Prologue: The One Billion Row Problem</h2>
+<p>I've been writing Rust for about a year now. When I first heard about the <strong>One Billion Row Challenge</strong> - originally a Java competition to process temperature measurements at extreme scale - I was intrigued. Many senior developers participated, sharing breakthrough techniques and optimization strategies.</p>
+<p>The challenge is deceptively hard:</p>
+<ul>
+<li>Input: A text file with <strong>1 billion rows</strong></li>
+<li>Format: <code>station_name;temperature</code> (with duplicates)</li>
+<li>Output: Min, Max, and Average temperature for each unique station</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Vijayawada;12.3</span></span>
+<span class="giallo-l"><span>Bezawada;21.9</span></span>
+<span class="giallo-l"><span>Vijayawada;15.1</span></span>
+<span class="giallo-l"><span>...</span></span></code></pre>
+<p>The ceiling I hit was predictable: <strong>naive parsing doesn't scale</strong>. Reading 13B with buffered readers, parsing floats, allocating strings - every operation multiplied by a billion becomes a bottleneck.</p>
+<p>Existing solutions in the challenge used sophisticated techniques: memory mapping, SIMD, custom hashers. But I wanted to <strong>discover these optimizations myself</strong>, starting from nothing and iterating toward performance.</p>
+<p>This is the story of <strong>1brc</strong>.</p>
+<p>More importantly, this is a manual on how to <strong>transform naive code into high-performance systems software</strong>.</p>
+<hr />
+<h2 id="part-i-the-naive-foundation">PART I: THE NAIVE FOUNDATION</h2>
+<h3 id="chapter-1-the-bufferedreader-trap">Chapter 1: The BufferedReader Trap</h3>
+<h4 id="the-problem-every-beginner-makes">The Problem Every Beginner Makes</h4>
+<p>At billion-row scale, "readable code" and "performant code" diverge dramatically. Let's start with the most obvious solution - the one most developers would write first.</p>
+<h4 id="the-solution-bufferedreader-with-btreemap">The Solution: BufferedReader with BTreeMap</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Version 1: The Initial Attempt</span></span>
+<span class="giallo-l"><span>use std::{</span></span>
+<span class="giallo-l"><span>    collections::BTreeMap,</span></span>
+<span class="giallo-l"><span>    fs::File,</span></span>
+<span class="giallo-l"><span>    io::{BufRead, BufReader},</span></span>
+<span class="giallo-l"><span>};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>pub fn main() {</span></span>
+<span class="giallo-l"><span>    let f = File::open(&quot;measurements.txt&quot;).unwrap();</span></span>
+<span class="giallo-l"><span>    let f = BufReader::new(f);</span></span>
+<span class="giallo-l"><span>    let mut bmap = BTreeMap::new();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    for k in f.lines() {</span></span>
+<span class="giallo-l"><span>        let k = k.unwrap();</span></span>
+<span class="giallo-l"><span>        let (city, temp) = k.split_once(&quot;;&quot;).unwrap();</span></span>
+<span class="giallo-l"><span>        let stats = bmap</span></span>
+<span class="giallo-l"><span>            .entry(city.to_string())</span></span>
+<span class="giallo-l"><span>            .or_insert((f64::MAX, 0 as usize, 0 as f64, f64::MIN));</span></span>
+<span class="giallo-l"><span>        let temp: f64 = temp.parse().unwrap();</span></span>
+<span class="giallo-l"><span>        stats.0 = stats.0.min(temp);</span></span>
+<span class="giallo-l"><span>        stats.1 += 1;</span></span>
+<span class="giallo-l"><span>        stats.2 += temp;</span></span>
+<span class="giallo-l"><span>        stats.3 = stats.3.max(temp);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    // ... print results</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>What this does:</strong></p>
+<ol>
+<li>Opens file with <code>BufReader</code> - allocates kernel buffer, user buffer</li>
+<li><code>.lines()</code> - allocates a new <code>String</code> for every line</li>
+<li><code>.to_string()</code> - allocates another String for the station name</li>
+<li><code>.parse::&lt;f64&gt;()</code> - parses to floating point, expensive operation</li>
+<li><code>BTreeMap</code> - maintains sorted order on every insert</li>
+</ol>
+<p><strong>Estimated time:</strong> Multiple minutes for 1 billion rows.</p>
+<p><strong>Why it's slow:</strong></p>
+<ul>
+<li><strong>Allocation storm</strong>: Billions of allocations for strings</li>
+<li><strong>Copy overhead</strong>: <code>BufReader</code> copies from kernel buffer → user buffer</li>
+<li><strong>Float parsing</strong>: <code>f64</code> parsing is expensive compared to integer operations</li>
+<li><strong>Sorting overhead</strong>: BTreeMap maintains order during insertion (O(log n) per insert)</li>
+</ul>
+<hr />
+<h3 id="chapter-2-the-hashmap-optimization">Chapter 2: The HashMap Optimization</h3>
+<h4 id="the-sorting-problem">The Sorting Problem</h4>
+<p>The first optimization is obvious: <strong>stop sorting on every insert</strong>.</p>
+<p><code>BTreeMap</code> maintains sorted order, requiring O(log n) comparisons per insertion. At a billion rows with ~400 unique stations, that's billions of unnecessary comparisons.</p>
+<h4 id="the-solution-switch-to-hashmap">The Solution: Switch to HashMap</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Version 2: HashMap for O(1) lookups</span></span>
+<span class="giallo-l"><span>let mut hmap: HashMap&lt;String, (f64, usize, f64, f64)&gt; = HashMap::new();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>for k in f.lines() {</span></span>
+<span class="giallo-l"><span>    let k = k.unwrap();</span></span>
+<span class="giallo-l"><span>    let (city, temp) = k.split_once(&quot;;&quot;).unwrap();</span></span>
+<span class="giallo-l"><span>    let stats = match hmap.get_mut(city) {</span></span>
+<span class="giallo-l"><span>        Some(k) =&gt; k,</span></span>
+<span class="giallo-l"><span>        None =&gt; hmap.entry(city.to_string())</span></span>
+<span class="giallo-l"><span>            .or_insert((f64::MAX, 0, 0.0, f64::MIN))</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    let temp: f64 = temp.parse().unwrap();</span></span>
+<span class="giallo-l"><span>    stats.0 = stats.0.min(temp);</span></span>
+<span class="giallo-l"><span>    stats.1 += 1;</span></span>
+<span class="giallo-l"><span>    stats.2 += temp;</span></span>
+<span class="giallo-l"><span>    stats.3 = stats.3.max(temp);</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Sort only once at the end</span></span>
+<span class="giallo-l"><span>let stats = BTreeMap::from_iter(hmap);</span></span></code></pre>
+<p><strong>Key insight:</strong></p>
+<ul>
+<li>HashMap gives O(1) amortized lookup</li>
+<li>Sort once at the end instead of maintaining order throughout</li>
+<li><strong>Significant improvement</strong>, but still bottlenecked by allocations</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    DATA FLOW (Naive)                        │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                             │</span></span>
+<span class="giallo-l"><span>│  Disk ──► Kernel Buffer ──► User Buffer ──► String Alloc   │</span></span>
+<span class="giallo-l"><span>│                    │              │               │         │</span></span>
+<span class="giallo-l"><span>│                    ▼              ▼               ▼         │</span></span>
+<span class="giallo-l"><span>│               memcpy()      .lines()      .to_string()      │</span></span>
+<span class="giallo-l"><span>│                                                             │</span></span>
+<span class="giallo-l"><span>│  Each line: 2 allocations + 1 float parse + 1 hash lookup  │</span></span>
+<span class="giallo-l"><span>│  1 billion lines = Billions of allocations                 │</span></span>
+<span class="giallo-l"><span>│                                                             │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-3-the-string-problem">Chapter 3: The String Problem</h3>
+<h4 id="the-allocation-ceiling">The Allocation Ceiling</h4>
+<p>Profiling revealed the next bottleneck: <strong>String allocations</strong>.</p>
+<p>Every <code>.to_string()</code> allocates heap memory. At a billion rows, even with only ~400 unique stations, we're allocating billions of Strings, then immediately discarding most of them.</p>
+<h4 id="the-solution-work-with-bytes">The Solution: Work with Bytes</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Version 3: Avoid String, work with &amp;[u8]</span></span>
+<span class="giallo-l"><span>let mut hmap: HashMap&lt;Vec&lt;u8&gt;, (f64, usize, f64, f64)&gt; = HashMap::new();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>for k in f.split(b&#39;\n&#39;) {</span></span>
+<span class="giallo-l"><span>    let k = k.unwrap();</span></span>
+<span class="giallo-l"><span>    // Split from the right - semicolon is near the end</span></span>
+<span class="giallo-l"><span>    let mut k = k.rsplitn(2, |k| *k == b&#39;;&#39;);</span></span>
+<span class="giallo-l"><span>    let temp = k.next().unwrap();</span></span>
+<span class="giallo-l"><span>    let city = k.next().unwrap();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let stats = match hmap.get_mut(city) {</span></span>
+<span class="giallo-l"><span>        Some(k) =&gt; k,</span></span>
+<span class="giallo-l"><span>        None =&gt; hmap.entry(city.to_vec())</span></span>
+<span class="giallo-l"><span>            .or_insert((f64::MAX, 0, 0.0, f64::MIN))</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    // ... update stats</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Improvements:</strong></p>
+<ul>
+<li><code>.split(b'\n')</code> - splits on bytes, no UTF-8 validation</li>
+<li><code>.rsplitn(2, ...)</code> - splits from right (semicolon is near end)</li>
+<li><code>Vec&lt;u8&gt;</code> instead of <code>String</code> - no UTF-8 checks</li>
+</ul>
+<p><strong>Still slow because:</strong></p>
+<ul>
+<li><code>Vec&lt;u8&gt;</code> still allocates on the heap</li>
+<li><code>f64</code> parsing is still expensive</li>
+<li><code>BufReader</code> still copies data</li>
+</ul>
+<hr />
+<h2 id="part-ii-the-memory-revolution">PART II: THE MEMORY REVOLUTION</h2>
+<h3 id="chapter-4-the-fallacy-of-just-read-the-file">Chapter 4: The Fallacy of "Just Read the File"</h3>
+<h4 id="attempt-1-bufferedreader-is-good-enough">Attempt 1: BufferedReader is "Good Enough"</h4>
+<p>The <code>BufReader</code> pattern is standard:</p>
+<ol>
+<li>Kernel reads file into kernel buffer</li>
+<li><code>BufReader</code> copies from kernel buffer to user buffer</li>
+<li><code>.lines()</code> creates String slices</li>
+</ol>
+<p><strong>The hidden cost:</strong> Every <code>memcpy</code> at billion-row scale is measurable.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                  TRADITIONAL I/O PATH                          │</span></span>
+<span class="giallo-l"><span>├────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                │</span></span>
+<span class="giallo-l"><span>│   ┌──────┐      ┌──────────┐      ┌──────────┐                │</span></span>
+<span class="giallo-l"><span>│   │ Disk │─────►│  Kernel  │─────►│   User   │                │</span></span>
+<span class="giallo-l"><span>│   └──────┘      │  Buffer  │      │  Buffer  │                │</span></span>
+<span class="giallo-l"><span>│                 └──────────┘      └──────────┘                │</span></span>
+<span class="giallo-l"><span>│                      │                 │                       │</span></span>
+<span class="giallo-l"><span>│                      │    memcpy()     │                       │</span></span>
+<span class="giallo-l"><span>│                      └─────────────────┘                       │</span></span>
+<span class="giallo-l"><span>│                                                                │</span></span>
+<span class="giallo-l"><span>│   For 100GB file: 100GB copied from kernel to user space     │</span></span>
+<span class="giallo-l"><span>│                                                                │</span></span>
+<span class="giallo-l"><span>└────────────────────────────────────────────────────────────────┘</span></span></code></pre><h4 id="attempt-2-memory-mapped-i-o">Attempt 2: Memory-Mapped I/O</h4>
+<p><strong>The insight:</strong> What if we could read directly from kernel memory?</p>
+<p>Memory-mapped I/O tells the operating system: "Map this file directly into my process's virtual address space."</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>fn mmap(f: &amp;File) -&gt; &amp;[u8] {</span></span>
+<span class="giallo-l"><span>    let len = f.metadata().unwrap().len() as usize;</span></span>
+<span class="giallo-l"><span>    unsafe {</span></span>
+<span class="giallo-l"><span>        let ptr = libc::mmap(</span></span>
+<span class="giallo-l"><span>            ptr::null_mut(),  // Let kernel choose address</span></span>
+<span class="giallo-l"><span>            len,              // Size of mapping</span></span>
+<span class="giallo-l"><span>            PROT_READ,        // Read-only access</span></span>
+<span class="giallo-l"><span>            MAP_PRIVATE,      // Copy-on-write (we&#39;re only reading)</span></span>
+<span class="giallo-l"><span>            f.as_raw_fd(),    // File descriptor</span></span>
+<span class="giallo-l"><span>            0,                // Start at offset 0</span></span>
+<span class="giallo-l"><span>        );</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        if ptr == libc::MAP_FAILED {</span></span>
+<span class="giallo-l"><span>            panic!(&quot;{}&quot;, std::io::Error::last_os_error());</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        std::slice::from_raw_parts(ptr as *const u8, len)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>What happens under the hood:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                  MEMORY-MAPPED I/O PATH                        │</span></span>
+<span class="giallo-l"><span>├────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                │</span></span>
+<span class="giallo-l"><span>│   ┌──────┐      ┌──────────────────────────────────┐           │</span></span>
+<span class="giallo-l"><span>│   │ Disk │─────►│        Virtual Memory            │           │</span></span>
+<span class="giallo-l"><span>│   └──────┘      │  ┌────────────────────────────┐ │           │</span></span>
+<span class="giallo-l"><span>│                 │  │   Page Cache (Kernel)      │ │           │</span></span>
+<span class="giallo-l"><span>│                 │  │   ┌────┐ ┌────┐ ┌────┐    │ │           │</span></span>
+<span class="giallo-l"><span>│                 │  │   │Page│ │Page│ │Page│    │ │           │</span></span>
+<span class="giallo-l"><span>│                 │  │   └────┘ └────┘ └────┘    │ │           │</span></span>
+<span class="giallo-l"><span>│                 │  └────────────────────────────┘ │           │</span></span>
+<span class="giallo-l"><span>│                 └──────────────────────────────────┘           │</span></span>
+<span class="giallo-l"><span>│                              ▲                                 │</span></span>
+<span class="giallo-l"><span>│                              │                                 │</span></span>
+<span class="giallo-l"><span>│                    Direct CPU Access                          │</span></span>
+<span class="giallo-l"><span>│                    (No memcpy!)                               │</span></span>
+<span class="giallo-l"><span>│                              │                                 │</span></span>
+<span class="giallo-l"><span>│                              ▼                                 │</span></span>
+<span class="giallo-l"><span>│                 ┌──────────────────┐                           │</span></span>
+<span class="giallo-l"><span>│                 │  Application    │                           │</span></span>
+<span class="giallo-l"><span>│                 │  &amp;[u8] slice    │                           │</span></span>
+<span class="giallo-l"><span>│                 └──────────────────┘                           │</span></span>
+<span class="giallo-l"><span>│                                                                │</span></span>
+<span class="giallo-l"><span>└────────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<p><strong>Benefits:</strong></p>
+<ol>
+<li><strong>Zero-copy</strong>: No <code>memcpy</code> from kernel to user buffer</li>
+<li><strong>Lazy loading</strong>: Pages loaded on-demand, not all at once</li>
+<li><strong>Kernel-managed</strong>: OS handles caching, prefetching</li>
+</ol>
+<hr />
+<h3 id="chapter-5-the-kernel-whisperer-madvise">Chapter 5: The Kernel Whisperer (madvise)</h3>
+<h4 id="the-sequential-access-hint">The Sequential Access Hint</h4>
+<p>Memory mapping is good, but we can make it <strong>better</strong>.</p>
+<p>We know our access pattern: <strong>sequential read from start to finish</strong>. The kernel doesn't know this - it might use a random-access caching strategy.</p>
+<p><code>madvise()</code> tells the kernel our intentions:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use libc::{MADV_SEQUENTIAL, madvise};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// After mmap succeeds:</span></span>
+<span class="giallo-l"><span>if madvise(ptr, len, MADV_SEQUENTIAL) != 0 {</span></span>
+<span class="giallo-l"><span>    panic!(&quot;{}&quot;, std::io::Error::last_os_error());</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>What MADV_SEQUENTIAL does:</strong></p>
+<ol>
+<li><strong>Aggressive readahead</strong>: Kernel prefetches pages ahead</li>
+<li><strong>Cache eviction</strong>: Drop pages after reading (we won't revisit)</li>
+<li><strong>Reduced memory pressure</strong>: Don't pollute cache with old data</li>
+</ol>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌───────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                  MADV_SEQUENTIAL Effect                        │</span></span>
+<span class="giallo-l"><span>├───────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                               │</span></span>
+<span class="giallo-l"><span>│   Without MADV_SEQUENTIAL:     With MADV_SEQUENTIAL:         │</span></span>
+<span class="giallo-l"><span>│   ─────────────────────        ─────────────────────         │</span></span>
+<span class="giallo-l"><span>│                                                               │</span></span>
+<span class="giallo-l"><span>│   [1][2][3][4][5][6]           [1][2][3][4][5][6]            │</span></span>
+<span class="giallo-l"><span>│    ▲  ▲  ▲  ▲                   ▲  ▲  ▲  ▲                   │</span></span>
+<span class="giallo-l"><span>│    │  │  │  │                   │  │  │  │                   │</span></span>
+<span class="giallo-l"><span>│   Keep all in cache            Read, process, evict          │</span></span>
+<span class="giallo-l"><span>│   (wastes memory)              (efficient cache use)        │</span></span>
+<span class="giallo-l"><span>│                                                               │</span></span>
+<span class="giallo-l"><span>│   Cache hit on revisit         Cache hit on next chunk       │</span></span>
+<span class="giallo-l"><span>│   (but we never revisit)       (kernel prefetches ahead)     │</span></span>
+<span class="giallo-l"><span>│                                                               │</span></span>
+<span class="giallo-l"><span>└───────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<p><strong>Performance gain:</strong> Significant. The kernel now works <em>with</em> us, not against us.</p>
+<hr />
+<h3 id="chapter-6-the-result-so-far">Chapter 6: The Result So Far</h3>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Version 4: Memory-mapped I/O</span></span>
+<span class="giallo-l"><span>pub fn main() {</span></span>
+<span class="giallo-l"><span>    let f = File::open(&quot;measurements.txt&quot;).unwrap();</span></span>
+<span class="giallo-l"><span>    let map = mmap(&amp;f);  // Zero-copy access</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let mut hmap: HashMap&lt;Vec&lt;u8&gt;, (f64, usize, f64, f64)&gt; = HashMap::new();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    for k in map.split(|a| *a == b&#39;\n&#39;) {</span></span>
+<span class="giallo-l"><span>        if k.is_empty() { break; }</span></span>
+<span class="giallo-l"><span>        let mut k = k.rsplitn(2, |k| *k == b&#39;;&#39;);</span></span>
+<span class="giallo-l"><span>        let temp = k.next().unwrap();</span></span>
+<span class="giallo-l"><span>        let city = k.next().unwrap();</span></span>
+<span class="giallo-l"><span>        // ... update stats</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Still bottlenecked by:</strong></p>
+<ul>
+<li>Float parsing (<code>f64</code>)</li>
+<li>Heap allocations (<code>Vec&lt;u8&gt;</code>)</li>
+<li>Hash function overhead</li>
+</ul>
+<hr />
+<h2 id="part-iii-the-parsing-pipeline">PART III: THE PARSING PIPELINE</h2>
+<h3 id="chapter-7-the-float-problem">Chapter 7: The Float Problem</h3>
+<h4 id="the-expensive-f64">The Expensive f64</h4>
+<p>Parsing <code>12.3</code> to <code>f64</code> involves:</p>
+<ol>
+<li>Validate UTF-8</li>
+<li>Scan for decimal point</li>
+<li>Convert each digit</li>
+<li>Handle exponent, sign</li>
+<li>Compute floating-point representation</li>
+</ol>
+<p><strong>The invariant:</strong> Challenge temperatures always have <strong>one decimal place</strong>.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>12.3  → valid</span></span>
+<span class="giallo-l"><span>-5.0  → valid</span></span>
+<span class="giallo-l"><span>123.4 → valid</span></span></code></pre><h4 id="the-solution-fixed-point-arithmetic">The Solution: Fixed-Point Arithmetic</h4>
+<p>Instead of <code>f64</code>, store as <code>i16</code> (multiplied by 10):</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// 12.3  → 123</span></span>
+<span class="giallo-l"><span>// -5.0  → -50</span></span>
+<span class="giallo-l"><span>// 123.4 → 1234</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn parse_temperature(temp: &amp;[u8]) -&gt; i16 {</span></span>
+<span class="giallo-l"><span>    let mut neg = false;</span></span>
+<span class="giallo-l"><span>    let mut t = 0;</span></span>
+<span class="giallo-l"><span>    let mut mul = 1;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    for i in temp.iter().rev() {</span></span>
+<span class="giallo-l"><span>        match i {</span></span>
+<span class="giallo-l"><span>            b&#39;-&#39; =&gt; { neg = true; break; }</span></span>
+<span class="giallo-l"><span>            b&#39;.&#39; =&gt; { continue; }  // Skip decimal point</span></span>
+<span class="giallo-l"><span>            _ =&gt; {</span></span>
+<span class="giallo-l"><span>                t += i16::from(i - b&#39;0&#39;) * mul;</span></span>
+<span class="giallo-l"><span>                mul *= 10;</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    if neg { t = -t; }</span></span>
+<span class="giallo-l"><span>    t</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Why this is faster:</strong></p>
+<ul>
+<li>No floating-point conversion</li>
+<li>Integer arithmetic is CPU-native</li>
+<li>No heap allocation</li>
+</ul>
+<p><strong>Storage savings:</strong></p>
+<ul>
+<li><code>f64</code>: 8 bytes per temperature</li>
+<li><code>i16</code>: 2 bytes per temperature (4x smaller)</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│              FLOAT vs FIXED-POINT COMPARISON                  │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Float Parsing:           Fixed-Point Parsing:             │</span></span>
+<span class="giallo-l"><span>│   ─────────────            ───────────────────              │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   &quot;12.3&quot;                   &quot;12.3&quot;                           │</span></span>
+<span class="giallo-l"><span>│      │                        │                             │</span></span>
+<span class="giallo-l"><span>│      ▼                        ▼                             │</span></span>
+<span class="giallo-l"><span>│   UTF-8 validate          Read byte                         │</span></span>
+<span class="giallo-l"><span>│      │                        │                             │</span></span>
+<span class="giallo-l"><span>│      ▼                        ▼                             │</span></span>
+<span class="giallo-l"><span>│   Find decimal            Skip &#39;.&#39;                          │</span></span>
+<span class="giallo-l"><span>│      │                        │                             │</span></span>
+<span class="giallo-l"><span>│      ▼                        ▼                             │</span></span>
+<span class="giallo-l"><span>│   Convert digits          Convert digits: 3*1 + 2*10 + 1*100</span></span>
+<span class="giallo-l"><span>│      │                        │                             │</span></span>
+<span class="giallo-l"><span>│      ▼                        ▼                             │</span></span>
+<span class="giallo-l"><span>│   IEEE-754 encode         Store: 123                        │</span></span>
+<span class="giallo-l"><span>│      │                                                       │</span></span>
+<span class="giallo-l"><span>│      ▼                                                       │</span></span>
+<span class="giallo-l"><span>│   Store: 12.300000...                                        │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   ~100+ CPU cycles         ~20 CPU cycles                   │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-8-the-split-problem">Chapter 8: The Split Problem</h3>
+<h4 id="the-memchr-solution">The memchr Solution</h4>
+<p>Splitting on <code>\n</code> is expensive if done byte-by-byte. Enter <code>memchr</code>:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>use std::ffi::{c_int, c_void};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// libc::memchr is vectorized by the C library</span></span>
+<span class="giallo-l"><span>let next_line = unsafe { </span></span>
+<span class="giallo-l"><span>    libc::memchr(</span></span>
+<span class="giallo-l"><span>        rest.as_ptr() as *const c_void, </span></span>
+<span class="giallo-l"><span>        &#39;\n&#39; as c_int, </span></span>
+<span class="giallo-l"><span>        rest.len()</span></span>
+<span class="giallo-l"><span>    ) </span></span>
+<span class="giallo-l"><span>};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let k = if next_line.is_null() {</span></span>
+<span class="giallo-l"><span>    rest</span></span>
+<span class="giallo-l"><span>} else {</span></span>
+<span class="giallo-l"><span>    let len = unsafe { </span></span>
+<span class="giallo-l"><span>        next_line.offset_from(rest.as_ptr() as *const c_void) as usize </span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    &amp;rest[..len]</span></span>
+<span class="giallo-l"><span>};</span></span></code></pre>
+<p><strong>How memchr works:</strong></p>
+<ul>
+<li>Uses <strong>SIMD</strong> internally (vectorized search)</li>
+<li>Scans 16-64 bytes per instruction</li>
+<li>Much faster than byte-by-byte loop</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    memchr vs Naive Loop                       │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Naive (byte-by-byte):                                      │</span></span>
+<span class="giallo-l"><span>│   ┌─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┬─┐                         │</span></span>
+<span class="giallo-l"><span>│   │H│e│l│l│o│\n│B│y│e│\n│...│ │ │ │ │  1 byte per check     │</span></span>
+<span class="giallo-l"><span>│   └─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┴─┘                         │</span></span>
+<span class="giallo-l"><span>│         ↑  6 checks to find \n                               │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   memchr (SIMD):                                             │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────┬────────────────┬────────────────┐       │</span></span>
+<span class="giallo-l"><span>│   │ H e l l o \n B │ y e \n ...     │                │       │</span></span>
+<span class="giallo-l"><span>│   └────────────────┴────────────────┴────────────────┘       │</span></span>
+<span class="giallo-l"><span>│         16-64 bytes checked in ONE instruction               │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-9-the-simd-revolution">Chapter 9: The SIMD Revolution</h3>
+<h4 id="why-simd-matters">Why SIMD Matters</h4>
+<p><strong>SIMD</strong> = Single Instruction, Multiple Data</p>
+<p>Instead of processing 1 byte at a time, process 32 bytes at once.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#![feature(portable_simd)]</span></span>
+<span class="giallo-l"><span>use std::simd::{Simd, cmp::SimdPartialEq};</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn find_newline(map: &amp;[u8]) -&gt; Option&lt;usize&gt; {</span></span>
+<span class="giallo-l"><span>    const LANES: usize = 32;</span></span>
+<span class="giallo-l"><span>    const SPLAT: Simd&lt;u8, LANES&gt; = Simd::splat(b&#39;\n&#39;);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let mut i = 0;</span></span>
+<span class="giallo-l"><span>    while let Some((chunk, rem)) = map.split_first_chunk::&lt;32&gt;() {</span></span>
+<span class="giallo-l"><span>        let bytes = Simd::&lt;u8, LANES&gt;::from_array(*chunk);</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Compare 32 bytes to &#39;\n&#39; in ONE instruction</span></span>
+<span class="giallo-l"><span>        let mask = bytes.simd_eq(SPLAT);</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Find first match</span></span>
+<span class="giallo-l"><span>        let index = mask.first_set().map(|k| k + i);</span></span>
+<span class="giallo-l"><span>        if index.is_some() {</span></span>
+<span class="giallo-l"><span>            return index;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        i += LANES;</span></span>
+<span class="giallo-l"><span>        map = rem;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Handle remaining bytes</span></span>
+<span class="giallo-l"><span>    let k = Simd::&lt;u8, LANES&gt;::load_or_default(map);</span></span>
+<span class="giallo-l"><span>    k.simd_eq(SPLAT).first_set().map(|k| k + i)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>The key insight:</strong></p>
+<ul>
+<li>CPU has 128-bit, 256-bit, or 512-bit vector registers</li>
+<li><code>u8x32</code> = 32 bytes in one register</li>
+<li>One <code>simd_eq</code> compares all 32 bytes simultaneously</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    SIMD NEWLINE DETECTION                     │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Input: &quot;Vijayawada;12.3\nBezawada;21.9\n...&quot;              │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Step 1: Load 32 bytes into vector register                 │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────────────────────────────┐                 │</span></span>
+<span class="giallo-l"><span>│   │ Vijayawada;12.3\nBezawada;21.9\n...   │                 │</span></span>
+<span class="giallo-l"><span>│   └────────────────────────────────────────┘                 │</span></span>
+<span class="giallo-l"><span>│                      │                                       │</span></span>
+<span class="giallo-l"><span>│                      ▼                                       │</span></span>
+<span class="giallo-l"><span>│   Step 2: SIMD compare with &#39;\n&#39;                             │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────────────────────────────┐                 │</span></span>
+<span class="giallo-l"><span>│   │ 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 0 0 1 │  mask          │</span></span>
+<span class="giallo-l"><span>│   └────────────────────────────────────────┘                 │</span></span>
+<span class="giallo-l"><span>│                      │                                       │</span></span>
+<span class="giallo-l"><span>│                      ▼                                       │</span></span>
+<span class="giallo-l"><span>│   Step 3: Find first set bit = index of first \n            │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Result: Index 10 (found in 1 instruction, not 10)          │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-10-the-semicolon-split">Chapter 10: The Semicolon Split</h3>
+<h4 id="optimized-backwards-search">Optimized Backwards Search</h4>
+<p>Since temperatures are short (4-5 bytes), semicolon is near the end:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>fn split_semi(k: &amp;[u8]) -&gt; (&amp;[u8], &amp;[u8]) {</span></span>
+<span class="giallo-l"><span>    // Start from position len-4 (temp is ~4 chars)</span></span>
+<span class="giallo-l"><span>    let mut pos = k.len() - 4;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    unsafe {</span></span>
+<span class="giallo-l"><span>        // Search backwards for &#39;;&#39;</span></span>
+<span class="giallo-l"><span>        while *k.get_unchecked(pos) != b&#39;;&#39; {</span></span>
+<span class="giallo-l"><span>            pos -= 1;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        let (before, after) = k.split_at_unchecked(pos + 1);</span></span>
+<span class="giallo-l"><span>        (&amp;before[..before.len() - 1], after)</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Why backwards?</strong></p>
+<ul>
+<li>Temperature is always 3-5 characters (e.g., <code>12.3</code>, <code>-5.0</code>, <code>123.4</code>)</li>
+<li>Semicolon is near the end</li>
+<li>Average 1-2 comparisons vs scanning entire line</li>
+</ul>
+<hr />
+<h2 id="part-iv-the-architecture">PART IV: THE ARCHITECTURE</h2>
+<h3 id="chapter-11-the-multi-threading-dimension">Chapter 11: The Multi-Threading Dimension</h3>
+<h4 id="parallel-processing-strategy">Parallel Processing Strategy</h4>
+<p>With ~17 CPU threads available, parallelization is essential.</p>
+<p><strong>Challenge:</strong> How do you split a file for parallel processing when lines have variable lengths?</p>
+<p><strong>Solution:</strong> Chunk at approximately equal byte offsets, then find nearest newline:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>std::thread::scope(|scope| {</span></span>
+<span class="giallo-l"><span>    let map = mmap(&amp;f);</span></span>
+<span class="giallo-l"><span>    let nthreads = available_parallelism().unwrap();</span></span>
+<span class="giallo-l"><span>    let (tx, rx) = std::sync::mpsc::sync_channel(nthreads.get());</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let chunk_len = map.len() / nthreads;</span></span>
+<span class="giallo-l"><span>    let mut at = 0;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    for _ in 0..nthreads.get() {</span></span>
+<span class="giallo-l"><span>        let start = at;</span></span>
+<span class="giallo-l"><span>        let end = (at + chunk_len).min(map.len());</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Find newline to avoid splitting mid-line</span></span>
+<span class="giallo-l"><span>        let end = if end == map.len() {</span></span>
+<span class="giallo-l"><span>            map.len()</span></span>
+<span class="giallo-l"><span>        } else {</span></span>
+<span class="giallo-l"><span>            let newline_at = find_newline(&amp;map[end..]).unwrap();</span></span>
+<span class="giallo-l"><span>            end + newline_at + 1</span></span>
+<span class="giallo-l"><span>        };</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        let chunk = &amp;map[start..end];</span></span>
+<span class="giallo-l"><span>        at = end;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        let tx = tx.clone();</span></span>
+<span class="giallo-l"><span>        scope.spawn(move || tx.send(process_chunk(chunk)));</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    drop(tx);</span></span>
+<span class="giallo-l"><span>    // Aggregate results from all threads</span></span>
+<span class="giallo-l"><span>    for thread_stats in rx {</span></span>
+<span class="giallo-l"><span>        merge_stats(&amp;mut final_stats, thread_stats);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>});</span></span></code></pre><pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    PARALLEL CHUNKING                          │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   File (13GB):                                              │</span></span>
+<span class="giallo-l"><span>│   ┌──────────────────────────────────────────────────────┐   │</span></span>
+<span class="giallo-l"><span>│   │ Line 1 │ Line 2 │ Line 3 │ ... │ Line 1,000,000,000 │   │</span></span>
+<span class="giallo-l"><span>│   └──────────────────────────────────────────────────────┘   │</span></span>
+<span class="giallo-l"><span>│        │         │         │              │                  │</span></span>
+<span class="giallo-l"><span>│        ▼         ▼         ▼              ▼                  │</span></span>
+<span class="giallo-l"><span>│   ┌────────┬────────┬────────┬────────┬────────┐              │</span></span>
+<span class="giallo-l"><span>│   │Thread 1│Thread 2│Thread 3│  ...   │Thread N│              │</span></span>
+<span class="giallo-l"><span>│   │        │        │        │        │        │              │</span></span>
+<span class="giallo-l"><span>│   │ Find \n│ Find \n│ Find \n│        │ Find \n│              │</span></span>
+<span class="giallo-l"><span>│   │ align  │ align  │ align  │        │ align  │              │</span></span>
+<span class="giallo-l"><span>│   └────────┴────────┴────────┴────────┴────────┘              │</span></span>
+<span class="giallo-l"><span>│        │         │         │              │                  │</span></span>
+<span class="giallo-l"><span>│        ▼         ▼         ▼              ▼                  │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────┐    │</span></span>
+<span class="giallo-l"><span>│   │              Aggregate Results                       │    │</span></span>
+<span class="giallo-l"><span>│   │         (Single-threaded merge)                     │    │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────────────┘    │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-12-the-vault-strvec-custom-string-storage">Chapter 12: The Vault (StrVec - Custom String Storage)</h3>
+<h4 id="the-problem-with-strings">The Problem with Strings</h4>
+<p>Even <code>Vec&lt;u8&gt;</code> allocates heap memory for each unique station. With ~400 stations, that's 400 heap allocations.</p>
+<p>But most station names are <strong>short</strong> (&lt; 32 bytes). Can we store them inline?</p>
+<h4 id="the-solution-strvec-union">The Solution: StrVec Union</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>const INLINE: usize = std::mem::size_of::&lt;AllocatedStrVec&gt;(); // 32 bytes</span></span>
+<span class="giallo-l"><span>const LAST: usize = INLINE - 1;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#[repr(C)]</span></span>
+<span class="giallo-l"><span>union StrVec {</span></span>
+<span class="giallo-l"><span>    inlined: [u8; INLINE],  // Small strings: store inline</span></span>
+<span class="giallo-l"><span>    heap: ManuallyDrop&lt;AllocatedStrVec&gt;,  // Large strings: heap allocate</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>#[repr(C)]</span></span>
+<span class="giallo-l"><span>struct AllocatedStrVec {</span></span>
+<span class="giallo-l"><span>    ptr: *mut u8,</span></span>
+<span class="giallo-l"><span>    len: usize,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl StrVec {</span></span>
+<span class="giallo-l"><span>    pub fn new(s: &amp;[u8]) -&gt; Self {</span></span>
+<span class="giallo-l"><span>        if s.len() &lt; INLINE {</span></span>
+<span class="giallo-l"><span>            // Inline storage: copy into union</span></span>
+<span class="giallo-l"><span>            let mut combined = [0u8; INLINE];</span></span>
+<span class="giallo-l"><span>            combined[..s.len()].copy_from_slice(s);</span></span>
+<span class="giallo-l"><span>            combined[LAST] = s.len() as u8 + 1;  // Length marker</span></span>
+<span class="giallo-l"><span>            Self { inlined: combined }</span></span>
+<span class="giallo-l"><span>        } else {</span></span>
+<span class="giallo-l"><span>            // Heap allocation for large strings</span></span>
+<span class="giallo-l"><span>            let ptr = Box::into_raw(s.to_vec().into_boxed_slice());</span></span>
+<span class="giallo-l"><span>            Self {</span></span>
+<span class="giallo-l"><span>                heap: ManuallyDrop::new(AllocatedStrVec {</span></span>
+<span class="giallo-l"><span>                    ptr: ptr.cast(),</span></span>
+<span class="giallo-l"><span>                    len: ptr.len().to_le(),</span></span>
+<span class="giallo-l"><span>                }),</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    fn as_ref(&amp;self) -&gt; &amp;[u8] {</span></span>
+<span class="giallo-l"><span>        unsafe {</span></span>
+<span class="giallo-l"><span>            if self.inlined[LAST] != 0x00 {</span></span>
+<span class="giallo-l"><span>                // Inline: extract length from last byte</span></span>
+<span class="giallo-l"><span>                let len = self.inlined[LAST] as usize - 1;</span></span>
+<span class="giallo-l"><span>                std::slice::from_raw_parts(self.inlined.as_ptr(), len)</span></span>
+<span class="giallo-l"><span>            } else {</span></span>
+<span class="giallo-l"><span>                // Heap: read from allocated memory</span></span>
+<span class="giallo-l"><span>                std::hint::cold_path();</span></span>
+<span class="giallo-l"><span>                let len = usize::from_le(self.heap.len);</span></span>
+<span class="giallo-l"><span>                std::slice::from_raw_parts(self.heap.ptr, len)</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Memory layout:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    StrVec MEMORY LAYOUT                       │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Short String (&lt; 32 bytes):                                  │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────────────────────────────────────┬────┐    │</span></span>
+<span class="giallo-l"><span>│   │  V  i  j  a  y  a  w  a  d  a  0  0  ...  0   │ 11 │    │</span></span>
+<span class="giallo-l"><span>│   └────────────────────────────────────────────────┴────┘    │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────┘  └──┘      │</span></span>
+<span class="giallo-l"><span>│                    Data (31 bytes max)        Length marker   │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   No heap allocation! 32 bytes total on stack                │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Long String (&gt;= 32 bytes):                                 │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────────────────────────────────────────┐    │</span></span>
+<span class="giallo-l"><span>│   │  ptr (8 bytes)          │  len (8 bytes)           │    │</span></span>
+<span class="giallo-l"><span>│   └────────────────────────────────────────────────────┘    │</span></span>
+<span class="giallo-l"><span>│            │                                                 │</span></span>
+<span class="giallo-l"><span>│            ▼                                                 │</span></span>
+<span class="giallo-l"><span>│   ┌────────────────────────────────────────────────────┐    │</span></span>
+<span class="giallo-l"><span>│   │  Heap allocated string bytes...                    │    │</span></span>
+<span class="giallo-l"><span>│   └────────────────────────────────────────────────────┘    │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   16 bytes on stack + heap allocation                       │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-13-the-hash-function">Chapter 13: The Hash Function</h3>
+<h4 id="why-default-hashing-is-slow">Why Default Hashing is Slow</h4>
+<p>Rust's default <code>HashMap</code> uses SipHash - cryptographically secure but slow.</p>
+<p>For station names (short, non-malicious), we can use a faster hash.</p>
+<h4 id="fasthasher-implementation">FastHasher Implementation</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>const HASH_K: u64 = 0xf1357aea2e62a9c5;</span></span>
+<span class="giallo-l"><span>const HASH_SEED: u64 = 0x13198a2e03707344;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>struct Fasthasher(u64);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>impl Hasher for Fasthasher {</span></span>
+<span class="giallo-l"><span>    fn finish(&amp;self) -&gt; u64 {</span></span>
+<span class="giallo-l"><span>        self.0.rotate_left(26)  // Final mixing</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    fn write(&amp;mut self, bytes: &amp;[u8]) {</span></span>
+<span class="giallo-l"><span>        let len = bytes.len();</span></span>
+<span class="giallo-l"><span>        let mut acc = HASH_SEED;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        match len {</span></span>
+<span class="giallo-l"><span>            0..4 =&gt; {</span></span>
+<span class="giallo-l"><span>                // For very short strings: use first, middle, last bytes</span></span>
+<span class="giallo-l"><span>                let low = bytes[0];</span></span>
+<span class="giallo-l"><span>                let mid = bytes[len / 2];</span></span>
+<span class="giallo-l"><span>                let high = bytes[len - 1];</span></span>
+<span class="giallo-l"><span>                acc ^= (low as u64) | ((mid as u64) &lt;&lt; 8) | ((high as u64) &lt;&lt; 16);</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>            4.. =&gt; {</span></span>
+<span class="giallo-l"><span>                // For longer strings: use first 4 bytes</span></span>
+<span class="giallo-l"><span>                acc ^= u32::from_le_bytes(bytes[0..4].try_into().unwrap()) as u64;</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        self.0 = self.0.wrapping_add(acc).wrapping_mul(HASH_K);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Key optimizations:</strong></p>
+<ul>
+<li>No cryptographic security needed</li>
+<li>Use first bytes for quick differentiation</li>
+<li>Multiplication-based mixing (fast on modern CPUs)</li>
+</ul>
+<hr />
+<h3 id="chapter-14-the-temperature-parser-optimized">Chapter 14: The Temperature Parser (Optimized)</h3>
+<h4 id="final-optimized-parser">Final Optimized Parser</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#[inline]</span></span>
+<span class="giallo-l"><span>fn parse_temperature(k: &amp;[u8]) -&gt; i16 {</span></span>
+<span class="giallo-l"><span>    let tlen = k.len();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Compiler hint: temperature is always &gt;= 3 chars</span></span>
+<span class="giallo-l"><span>    unsafe { std::hint::assert_unchecked(tlen &gt;= 3); }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Branchless sign detection</span></span>
+<span class="giallo-l"><span>    let isneg = std::hint::select_unpredictable(k[0] == b&#39;-&#39;, true, false);</span></span>
+<span class="giallo-l"><span>    let sign = i16::from(!isneg) * 2 - 1;  // -1 or 1</span></span>
+<span class="giallo-l"><span>    let skip = usize::from(isneg);         // 0 or 1</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Branchless digit count detection</span></span>
+<span class="giallo-l"><span>    let isdd = std::hint::select_unpredictable(k.len() - skip == 4, true, false);</span></span>
+<span class="giallo-l"><span>    let mul = i16::from(isdd) * 90 + 10;   // 100 or 10</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let t1 = mul * i16::from(k[skip] - b&#39;0&#39;);</span></span>
+<span class="giallo-l"><span>    let t2 = i16::from(isdd) * 10 * i16::from(k[tlen - 3] - b&#39;0&#39;);</span></span>
+<span class="giallo-l"><span>    let t3 = i16::from(k[tlen - 1] - b&#39;0&#39;);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    sign * (t1 + t2 + t3)</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Optimizations:</strong></p>
+<ul>
+<li><code>select_unpredictable</code>: Removes branch misprediction</li>
+<li>Direct digit extraction: No loops</li>
+<li>Handles both positive and negative, 1-2 digit temperatures</li>
+</ul>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                TEMPERATURE PARSING CASES                      │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   Input          →  Parsed Value                             │</span></span>
+<span class="giallo-l"><span>│   ─────────────────────────────                              │</span></span>
+<span class="giallo-l"><span>│   &quot;12.3&quot;         →  123                                      │</span></span>
+<span class="giallo-l"><span>│   &quot;-5.0&quot;         →  -50                                      │</span></span>
+<span class="giallo-l"><span>│   &quot;123.4&quot;        →  1234                                     │</span></span>
+<span class="giallo-l"><span>│   &quot;-99.9&quot;        →  -999                                     │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   All handled without branches, in ~10 CPU cycles            │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<hr />
+<h3 id="chapter-final-the-complete-architecture">Chapter Final: The Complete Architecture</h3>
+<h4 id="final-code-structure">Final Code Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌──────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    brrrc ARCHITECTURE                         │</span></span>
+<span class="giallo-l"><span>├──────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>│   main()                                                     │</span></span>
+<span class="giallo-l"><span>│   │                                                          │</span></span>
+<span class="giallo-l"><span>│   ├── mmap(file) ──────────────────────────► &amp;[u8]          │</span></span>
+<span class="giallo-l"><span>│   │   (Zero-copy file access)                                │</span></span>
+<span class="giallo-l"><span>│   │                                                          │</span></span>
+<span class="giallo-l"><span>│   ├── Thread::scope ──────────────────────────┐            │</span></span>
+<span class="giallo-l"><span>│   │   │                                        │            │</span></span>
+<span class="giallo-l"><span>│   │   ├── Thread 1: process_chunk() ──► HashMap           │</span></span>
+<span class="giallo-l"><span>│   │   │   ├── find_newline() (SIMD)              │            │</span></span>
+<span class="giallo-l"><span>│   │   │   ├── split_semi()                       │            │</span></span>
+<span class="giallo-l"><span>│   │   │   ├── parse_temperature()                │            │</span></span>
+<span class="giallo-l"><span>│   │   │   └── update_stats()                     │            │</span></span>
+<span class="giallo-l"><span>│   │   │                                        │            │</span></span>
+<span class="giallo-l"><span>│   │   ├── Thread 2: ...                          │            │</span></span>
+<span class="giallo-l"><span>│   │   │                                        │            │</span></span>
+<span class="giallo-l"><span>│   │   └── Thread N: ...                          │            │</span></span>
+<span class="giallo-l"><span>│   │                                              │            │</span></span>
+<span class="giallo-l"><span>│   └── Aggregate: merge all HashMaps ────────────┘            │</span></span>
+<span class="giallo-l"><span>│       │                                                      │</span></span>
+<span class="giallo-l"><span>│       └── print() ──────────────────────────► Output        │</span></span>
+<span class="giallo-l"><span>│           (Sorted by station name)                           │</span></span>
+<span class="giallo-l"><span>│                                                              │</span></span>
+<span class="giallo-l"><span>└──────────────────────────────────────────────────────────────┘</span></span></code></pre><h4 id="stat-data-structure">Stat Data Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#[derive(Copy, Clone)]</span></span>
+<span class="giallo-l"><span>struct Stat {</span></span>
+<span class="giallo-l"><span>    min: i16,    // Minimum temperature (×10)</span></span>
+<span class="giallo-l"><span>    max: i16,    // Maximum temperature (×10)</span></span>
+<span class="giallo-l"><span>    sum: i64,    // Sum of all temperatures (for average)</span></span>
+<span class="giallo-l"><span>    count: u32,  // Number of measurements</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p><strong>Output format:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>{Station=Min/Avg/Max, ...}</span></span>
+<span class="giallo-l"><span>{Abha=-5.0/18.0/39.9, Abidjan=-5.0/26.0/40.0, ...}</span></span></code></pre>
+<hr />
+<h2 id="epilogue-the-rust-advantage">Epilogue: The Rust Advantage</h2>
+<p><strong>Key lessons:</strong></p>
+<ol>
+<li><strong>Profile before optimizing</strong> - Each bottleneck was discovered through profiling</li>
+<li><strong>Understand your data</strong> - The one-decimal-place invariant enabled fixed-point arithmetic</li>
+<li><strong>Work with the kernel</strong> - mmap + madvise transformed I/O</li>
+<li><strong>SIMD is powerful</strong> - 32x throughput on simple operations</li>
+<li><strong>Avoid allocations</strong> - StrVec eliminates heap for small strings</li>
+<li><strong>Parallelize intelligently</strong> - Chunk at byte boundaries, align at newlines</li>
+</ol>
+<p><strong>What Rust enabled:</strong></p>
+<ul>
+<li><strong>Zero-cost abstractions</strong>: Unsafe code for hot paths, safe wrappers elsewhere</li>
+<li><strong>Portable SIMD</strong>: <code>std::simd</code> provides vectorized operations without platform-specific intrinsics</li>
+<li><strong>Fearless concurrency</strong>: <code>std::thread::scope</code> ensures thread safety</li>
+<li><strong>Control</strong>: Direct memory layout with <code>#[repr(C)]</code> and unions</li>
+</ul>
+<hr />
+<h2 id="the-code">The Code</h2>
+<p><strong>GitHub:</strong> https://github.com/ygndotgg/1brrrc</p>
+<p><strong>Build:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>cargo build --release</span></span></code></pre>
+<p><strong>Run:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>./target/release/brrrc</span></span></code></pre>
+<p><strong>Profile:</strong></p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>perf record -F 99 ./target/release/brrrc</span></span>
+<span class="giallo-l"><span>perf script &gt; out.perf</span></span>
+<span class="giallo-l"><span>flamegraph.pl out.perf &gt; flamegraph.svg</span></span></code></pre>
+<hr />
+<p><strong>brrrc: One Billion Rows in 3.29 Seconds</strong> | my thoughts</p>
+
+        
+    </article>
+
+    <!-- Comment section -->
+    
+      
+        
+          <script
+  src="https://giscus.app/client.js"
+  data-repo="ygndotgg&#x2F;ygndotgg.github.io"
+  data-repo-id="R_kgDORbe62A"
+  data-category="General"
+  data-category-id="DIC_kwDORbe62M4C3cVZ"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+
+  
+  data-theme="preferred_color_scheme"
+  
+
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+
+        
+      
+    
+
+
+    <!-- Page footer -->
+    
+    <footer>
+        <hr>
+        <p>
+            
+            
+                
+                in <a href="https://ygndotgg.github.io/categories/rust/">rust</a>
+            
+            
+                and
+                tagged
+                
+                    <a href="https://ygndotgg.github.io/tags/rust/">rust</a>
+                    
+                        
+                            
+                                ,
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/performance/">performance</a>
+                    
+                        
+                            
+                                and
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/optimization/">optimization</a>
+                    
+                        
+                    
+                
+            
+        </p>
+
+        <!-- Revision history (optional) -->
+        
+          
+            
+              
+            
+          
+        
+
+        
+        
+    </footer>
+
+
+</article>
+
+
+    </main>
+    
+
+  </body>
+</html>

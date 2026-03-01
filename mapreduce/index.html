@@ -1,0 +1,872 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Enable responsiveness on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+      
+        <meta name="description" content="Personal blog about programming and tech" />
+        <meta property="og:description" content="Personal blog about programming and tech" />
+        <meta property="twitter:description" content="Personal blog about programming and tech" />
+      
+    
+
+    <!-- Title -->
+    
+      
+    
+    <title>
+    
+    MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch
+    
+</title>
+
+    <!-- Additional Facebook Meta Tags -->
+    <meta property="og:site_name" content="YGN&#x27;s Blog" />
+    <meta
+      property="og:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;mapreduce&#x2F;"
+    />
+    <meta
+      property="og:type"
+      content="article"
+    />
+    <meta property="og:title" content="MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch" />
+
+    <!-- Additional Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;mapreduce&#x2F;"
+    />
+    <meta name="twitter:title" content="MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch" />
+
+    <!-- Additional Fediverse Tags -->
+     
+
+    <!-- Cover images -->
+    
+    
+
+    <meta
+      property="og:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <meta
+      name="twitter:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <!-- Favicons -->
+    
+    <link
+      rel="icon"
+      type="image/png"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.svg"
+    />
+    <link
+      rel="shortcut icon"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.ico"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch" />
+    <link
+      rel="manifest"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/site.webmanifest"
+    />
+    
+
+    <!-- RSS Feed -->
+    
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="RSS"
+      href="https://ygndotgg.github.io/atom.xml"
+    />
+    
+
+    <!-- Load Styles -->
+    
+      <link
+        rel="stylesheet"
+        href="https://ygndotgg.github.io/site.css"
+      />
+    
+
+    <!-- Syntax highlighting theming (giallo) -->
+    <link id="giallo-dark" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-dark.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link id="giallo-light" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-light.css"
+      media="(prefers-color-scheme: light)"
+    />
+
+    <!-- Load Fonts -->
+    
+
+  
+
+
+
+
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
+
+
+
+<!-- Forcing Font -->
+<style>
+body {
+  font-family:
+    "JetBrains Mono", Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New,
+    monospace, serif !important;
+}
+</style>
+
+
+    <!-- Pass Theme Preference as Data Attribute -->
+    <script src="https://ygndotgg.github.io/js/init-theme.js"></script>
+
+    <!-- Additional scripts -->
+    
+      
+      
+        <script src="https://ygndotgg.github.io/js/toggle-theme.js"></script>
+      
+      
+
+      
+  <script type="text/javascript" src="https://ygndotgg.github.io/elasticlunr.min.js"></script>
+  <script type="text/javascript" src="https://ygndotgg.github.io/js/search.js"></script>
+
+
+    
+  </head>
+
+  <!-- Body element (contents of the page) -->
+  <body class="hack main container">
+    
+  
+    
+    
+      
+  
+  <section class="nav-header">
+    <nav
+      itemscope
+      itemtype="http://schema.org/SiteNavigationElement"
+      class="navbar"
+    >
+      <section class="nav-links">
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io"
+        >
+          <span itemprop="name">Home</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/categories"
+        >
+          <span itemprop="name">Categories</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/tags"
+        >
+          <span itemprop="name">Tags</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://gaganyt.vercel.app"
+        >
+          <span itemprop="name">Portfolio</span>
+        </a>
+        
+      </section>
+    </nav>
+    <aside class="user-actions-container">
+      
+      <section class="search-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          class="search-icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input type="text" id="search" placeholder="Search..." />
+        <img
+          src="https://ygndotgg.github.io/icons/slash-square.svg"
+          id="slash-icon"
+          class="slash-icon"
+          alt="Press / to search"
+        />
+      </section>
+       
+      <a id="dark-mode-toggle" href="#">
+        <img
+          src="https://ygndotgg.github.io/icons/sun.svg"
+          id="sun-icon"
+          class="invert-icon"
+          alt="Light mode"
+        />
+        <img
+          src="https://ygndotgg.github.io/icons/moon.svg"
+          id="moon-icon"
+          alt="Dark mode"
+        />
+      </a>
+       
+      <a
+        href="https://ygndotgg.github.io/atom.xml"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/rss.svg"
+          id="rss-icon"
+          alt="RSS feed"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;github.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/github.svg"
+          id="github-icon"
+          alt="GitHub"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;x.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/mastodon.svg"
+          id="mastodon-icon"
+          alt="Mastodon"
+          class="social-icon"
+        />
+      </a>
+      
+    </aside>
+  </section>
+  
+  <!-- Search modal overlay and results (positioned globally) -->
+  <section class="search-backdrop"></section>
+  <dialog class="search-results" aria-live="polite">
+    <article class="search-modal-header">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        class="search-modal-icon"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        />
+      </svg>
+      <input type="text" id="search-modal" placeholder="Search..." />
+    </article>
+    <article class="search-results-count" id="search-results-count"></article>
+    <article class="search-results__items" role="list"></article>
+    <footer class="search-modal-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+      <span><kbd>↵ </kbd> to select</span>
+      <span><kbd>esc</kbd> to close</span>
+    </footer>
+  </dialog>
+  
+  
+
+    
+
+
+    <main>
+      
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch</h1>
+        <data class="muted">
+    <svg class="icon i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <data>9 minute read</data>
+    <svg class="icon i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2025-02-15
+</data>
+    </header>
+
+    <article itemprop="articleBody">
+        
+            <!-- If no summary separate from content, just render content -->
+            <h1 id="mapreduce-in-rust-a-hands-on-guide-to-building-distributed-systems-from-scratch">MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch</h1>
+<p><em>"You don't truly understand distributed systems until you've built one from scratch."</em></p>
+<p>That's what everyone tells you. Building a production-grade distributed system involves countless edge cases, failure scenarios, and subtle synchronization challenges that are impossible to appreciate until you've debugged a race condition at 3 AM.</p>
+<p>But honestly, they are WRONG. You don't need production scale to understand distributed systems. You need a working implementation that forces you to confront every hard problem the field has to offer.</p>
+<p>This is a technical deep-dive into building a MapReduce system in Rust, from first principles to a working implementation. We'll cover RPC communication, fault tolerance, task scheduling, and the elegant simplicity that makes MapReduce such a powerful abstraction.</p>
+<hr />
+<h2 id="what-this-post-covers">What This Post Covers</h2>
+<p><strong><a href="/mapreduce/#part-i-the-foundation">Part I: The Foundation</a></strong> - RPC, gRPC, and the communication layer that makes distributed systems possible</p>
+<p><strong><a href="/mapreduce/#part-ii-the-master">Part II: The Master</a></strong> - Task scheduling, fault tolerance through backup tasks, and health checks for stuck workers</p>
+<p><strong><a href="/mapreduce/#part-iii-the-worker">Part III: The Worker</a></strong> - Map and Reduce implementation, partitioning, and atomic file operations</p>
+<p><strong><a href="/mapreduce/#part-iv-the-complete-system">Part IV: The Complete System</a></strong> - Putting it all together, code architecture, and running the system</p>
+<hr />
+<h2 id="prologue-where-does-it-all-started">Prologue: Where Does it All Started</h2>
+<h3 id="the-mapreduce-abstraction">The MapReduce Abstraction</h3>
+<p>In 2004, Google published a paper that would revolutionize how we process large-scale data: "MapReduce: Simplified Data Processing on Large Clusters." The idea was elegantly simple—any problem can be solved by breaking it into two phases:</p>
+<ol>
+<li><strong>Map</strong>: Transform raw input into key-value pairs</li>
+<li><strong>Reduce</strong>: Aggregate those pairs into final results</li>
+</ol>
+<p>This abstraction is powerful because it hides all the complexity of distributed computing behind two function signatures. You don't need to think about network partitions, load balancing, or fault tolerance. The framework handles it all.</p>
+<p>But here's the thing—reading about it and implementing it are completely different experiences.</p>
+<h3 id="my-journey-from-curiosity-to-implementation">My Journey: From Curiosity to Implementation</h3>
+<p>I first encountered MapReduce in academic course MIT 6.824 Distributed Systems, I had understood, its motive but there are some small pitholes that only filled when i try to implement it on my own.</p>
+<p>This is the story of building a MapReduce system in Rust, Althrough it was supposed to Finish the Lab1 of MIT 6.824 Distributed Systems</p>
+<p>But more importantly, this is a manual on how to think about distributed systems—the mental models, the failure modes, and the elegant solutions that emerge when you build things from first principles.</p>
+<hr />
+<h2 id="part-i-the-foundation">PART I: The Foundation</h2>
+<h3 id="chapter-1-the-communication-problem">Chapter 1: The Communication Problem</h3>
+<h4 id="the-challenge-of-distributed-communication">The Challenge of Distributed Communication</h4>
+<p>In a distributed system, processes don't share memory. They communicate over the network, which is unreliable, slow, and can fail at any moment. Before we can build a distributed MapReduce, we need a way for the Master to tell Workers what to do, and for Workers to report results back.</p>
+<p>This is the RPC problem: how do we make a network call look like a local function call?</p>
+<h4 id="attempt-1-raw-tcp-sockets">Attempt 1: Raw TCP Sockets</h4>
+<p>The first version of this project started with raw TCP sockets. Workers would connect to the Master and exchange serialized messages:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Worker: &quot;I&#39;d like a task, please&quot;</span></span>
+<span class="giallo-l"><span>Master: &quot;Here&#39;s task #3 - process input/file1.txt&quot;</span></span>
+<span class="giallo-l"><span>Worker: &quot;Done! Here are my results: {word1: 42, word2: 17, ...}&quot;</span></span></code></pre>
+<p>This approach works but has serious limitations:</p>
+<ol>
+<li><strong>No contract</strong>: Every message format must be manually defined and validated</li>
+<li><strong>No type safety</strong>: You're serializing bytes and hoping both sides agree on the format</li>
+<li><strong>No code generation</strong>: Every new RPC method requires writing boilerplate</li>
+</ol>
+<h4 id="the-solution-grpc-with-protocol-buffers">The Solution: gRPC with Protocol Buffers</h4>
+<p>gRPC solves these problems by using Protocol Buffers (proto3) for schema definition:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>service MapReduce {</span></span>
+<span class="giallo-l"><span>  rpc GetTask (Empty) returns (TaskResponse);</span></span>
+<span class="giallo-l"><span>  rpc MapDone (MapDoneRequest) returns (Empty);</span></span>
+<span class="giallo-l"><span>  rpc ReduceDone (ReduceDoneRequest) returns (Empty);</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>message TaskResponse {</span></span>
+<span class="giallo-l"><span>  string task_type = 1;</span></span>
+<span class="giallo-l"><span>  uint32 task_id = 2;</span></span>
+<span class="giallo-l"><span>  repeated string input_files = 3;</span></span>
+<span class="giallo-l"><span>  uint32 n_reduce = 4;</span></span>
+<span class="giallo-l"><span>  string output_path = 5;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The key insight is that the <code>.proto</code> file is the <strong>single source of truth</strong>. From this definition, code is automatically generated for both client and server. This guarantees that both sides speak the same protocol—type errors become compile-time errors, not runtime surprises.</p>
+<p>Rust's implementation of gRPC comes from the <strong>tonic</strong> crate, which provides an async runtime built on top of tokio. This is perfect for our use case: workers can process tasks concurrently while waiting for RPC responses.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/client.rs</span></span>
+<span class="giallo-l"><span>pub async fn get_task(&amp;mut self) -&gt; Result&lt;TaskType, Box&lt;dyn std::error::Error&gt;&gt; {</span></span>
+<span class="giallo-l"><span>    let response = self.inner.get_task(mr::Empty {}).await?.into_inner();</span></span>
+<span class="giallo-l"><span>    // Type-safe response parsing - the compiler catches mismatches</span></span>
+<span class="giallo-l"><span>    match response.task_type.as_str() {</span></span>
+<span class="giallo-l"><span>        &quot;map&quot; =&gt; TaskType::Map { ... },</span></span>
+<span class="giallo-l"><span>        &quot;reduce&quot; =&gt; TaskType::Reduce { ... },</span></span>
+<span class="giallo-l"><span>        &quot;idle&quot; =&gt; TaskType::Idle,</span></span>
+<span class="giallo-l"><span>        &quot;exit&quot; =&gt; TaskType::Exit,</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre><h3 id="chapter-2-the-architecture-that-emerged">Chapter 2: The Architecture That Emerged</h3>
+<h4 id="the-master-worker-pattern">The Master-Worker Pattern</h4>
+<p>The commit history shows the natural evolution of this project:</p>
+<ol>
+<li><strong>Initial commit</strong> - Types and structure definitions</li>
+<li><strong>TCP implementation</strong> - Raw socket communication</li>
+<li><strong>gRPC migration</strong> - Using tonic for type-safe RPC</li>
+</ol>
+<p>This pattern is universal in distributed systems: a central coordinator (Master) assigns work to multiple workers who execute in parallel. The Master doesn't do the heavy lifting—it orchestrates.</p>
+<p>Here's how the architecture looks:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────┐         gRPC         ┌─────────────┐</span></span>
+<span class="giallo-l"><span>│   Master    │ ◄──────────────────► │   Worker 1  │</span></span>
+<span class="giallo-l"><span>│  (Port 50051)│                     │  (Task: Map)│</span></span>
+<span class="giallo-l"><span>└─────────────┘                     └─────────────┘</span></span>
+<span class="giallo-l"><span>      │                                    │</span></span>
+<span class="giallo-l"><span>      │                                    │</span></span>
+<span class="giallo-l"><span>      ▼                                    ▼</span></span>
+<span class="giallo-l"><span>┌─────────────┐                     ┌─────────────┐</span></span>
+<span class="giallo-l"><span>│ Task Queue  │                     │   Worker 2  │</span></span>
+<span class="giallo-l"><span>│  - Map 0-4  │                     │ (Task: Map) │</span></span>
+<span class="giallo-l"><span>│  - Reduce 0-4                     └─────────────┘</span></span>
+<span class="giallo-l"><span>└─────────────┘</span></span></code></pre>
+<p>The Master maintains two task queues: one for Map tasks and one for Reduce tasks. Workers poll the Master for work, execute the task, and report back when complete.</p>
+<hr />
+<h2 id="part-ii-the-master">PART II: The Master</h2>
+<h3 id="chapter-3-the-task-scheduling-problem">Chapter 3: The Task Scheduling Problem</h3>
+<h4 id="the-naive-approach">The Naive Approach</h4>
+<p>A first attempt at task scheduling might look like this:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>fn get_task(&amp;mut self) -&gt; Response {</span></span>
+<span class="giallo-l"><span>    // Find any idle task</span></span>
+<span class="giallo-l"><span>    if let Some((id, _)) = self.map_task.iter().find(|(_, s)| **s == Idle) {</span></span>
+<span class="giallo-l"><span>        return Response::Task { task_id: id, ... };</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    Response::NoTask</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This works—until it doesn't. The problem emerges when:</p>
+<ol>
+<li>Worker A claims Task 1</li>
+<li>Worker A crashes</li>
+<li>Task 1 is now "InProgress" forever</li>
+<li>All other workers are idle waiting for Task 1</li>
+<li>The entire job is deadlocked</li>
+</ol>
+<h4 id="the-solution-task-status-tracking">The Solution: Task Status Tracking</h4>
+<p>The implementation tracks detailed task state:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/rpc.rs</span></span>
+<span class="giallo-l"><span>pub enum TaskStatus {</span></span>
+<span class="giallo-l"><span>    Idle,</span></span>
+<span class="giallo-l"><span>    InProgress {</span></span>
+<span class="giallo-l"><span>        start_time: std::time::Instant,</span></span>
+<span class="giallo-l"><span>        backup_scheduled: bool,</span></span>
+<span class="giallo-l"><span>    },</span></span>
+<span class="giallo-l"><span>    Completed,</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The Master knows exactly which tasks are:</p>
+<ul>
+<li><strong>Idle</strong>: Available for workers to claim</li>
+<li><strong>InProgress</strong>: Currently being processed (with timestamp!)</li>
+<li><strong>Completed</strong>: Successfully finished</li>
+</ul>
+<h3 id="chapter-4-the-fault-tolerance-problem">Chapter 4: The Fault Tolerance Problem</h3>
+<h4 id="the-10-rule">The 10% Rule</h4>
+<p>Google's original MapReduce paper introduced a clever solution: when 5% of tasks remain, start scheduling <strong>backup tasks</strong> for in-progress work. If the original worker finishes, its results are ignored. If it fails, the backup task provides the result.</p>
+<p>Here's the implementation:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/master.rs</span></span>
+<span class="giallo-l"><span>fn should_schedule_backup(&amp;self) -&gt; bool {</span></span>
+<span class="giallo-l"><span>    let total = self.map_task.len();</span></span>
+<span class="giallo-l"><span>    let completed = self.map_task.values()</span></span>
+<span class="giallo-l"><span>        .filter(|s| matches!(s, TaskStatus::Completed))</span></span>
+<span class="giallo-l"><span>        .count();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let remaining = total - completed;</span></span>
+<span class="giallo-l"><span>    remaining &lt;= (total as f64 * 0.05) as usize</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>When should_backup() returns true, the Master looks for tasks that have been running for more than 10 seconds without a backup scheduled:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>let backup_threshold = Duration::from_secs(10);</span></span>
+<span class="giallo-l"><span>let backup_task = self.map_task.iter()</span></span>
+<span class="giallo-l"><span>    .find(|(_, status)| {</span></span>
+<span class="giallo-l"><span>        matches!(status, TaskStatus::InProgress { start_time, backup_scheduled }</span></span>
+<span class="giallo-l"><span>            if !backup_scheduled &amp;&amp; start_time.elapsed() &gt; backup_threshold)</span></span>
+<span class="giallo-l"><span>    });</span></span></code></pre>
+<p>This is the <strong>speculative execution</strong> pattern—running the same task twice in parallel, using whichever finishes first.</p>
+<h3 id="chapter-5-the-health-check-problem">Chapter 5: The Health Check Problem</h3>
+<h4 id="detecting-stuck-tasks">Detecting Stuck Tasks</h4>
+<p>What happens when a worker doesn't crash but just... stops responding? The backup mechanism won't help because no backup is scheduled until 10 seconds elapse.</p>
+<p>The solution is periodic health checks:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/master.rs</span></span>
+<span class="giallo-l"><span>pub fn health_check(&amp;mut self, timeout_secs: u64) {</span></span>
+<span class="giallo-l"><span>    let timeout = Duration::from_secs(timeout_secs);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    for (task_id, status) in &amp;mut self.map_task {</span></span>
+<span class="giallo-l"><span>        if let TaskStatus::InProgress { start_time, .. } = status {</span></span>
+<span class="giallo-l"><span>            if start_time.elapsed() &gt; timeout {</span></span>
+<span class="giallo-l"><span>                log::warn!(&quot;Map task {} timed out, resetting to Idle&quot;, task_id);</span></span>
+<span class="giallo-l"><span>                *status = TaskStatus::Idle;</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The Master runs a background thread that checks every 10 seconds whether any tasks have been "InProgress" for more than 30 seconds. If so, it resets them to Idle, making them available for other workers.</p>
+<p><strong>This is the core insight of fault tolerance</strong>: assume things will fail, detect failures aggressively, and recover gracefully.</p>
+<h3 id="chapter-6-phase-transitions">Chapter 6: Phase Transitions</h3>
+<h4 id="the-map-reduce-handoff">The Map → Reduce Handoff</h4>
+<p>One of the trickiest parts of MapReduce is knowing when to switch phases:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/master.rs</span></span>
+<span class="giallo-l"><span>fn handle_map_done(&amp;mut self, task_id: u32, files: HashMap&lt;u32, String&gt;) {</span></span>
+<span class="giallo-l"><span>    self.map_task.insert(task_id, TaskStatus::Completed);</span></span>
+<span class="giallo-l"><span>    self.map_outputs.insert(task_id, files);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Check if ALL map tasks are completed</span></span>
+<span class="giallo-l"><span>    let all_done = self.map_task.values()</span></span>
+<span class="giallo-l"><span>        .all(|s| matches!(s, TaskStatus::Completed));</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    if all_done &amp;&amp; self.phase == Phase::Map {</span></span>
+<span class="giallo-l"><span>        self.phase = Phase::Reduce;</span></span>
+<span class="giallo-l"><span>        // Initialize reduce tasks</span></span>
+<span class="giallo-l"><span>        for i in 0..self.n_reduce {</span></span>
+<span class="giallo-l"><span>            self.reduce_task.insert(i, TaskStatus::Idle);</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The Master won't assign Reduce tasks until every Map task is complete. This makes sense: you can't reduce until you have all the intermediate data from the Map phase.</p>
+<hr />
+<h2 id="part-iii-the-worker">PART III: The Worker</h2>
+<h3 id="chapter-7-the-map-phase">Chapter 7: The Map Phase</h3>
+<h4 id="input-processing">Input Processing</h4>
+<p>When a worker receives a Map task, it reads the input file and transforms it into key-value pairs:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/worker.rs</span></span>
+<span class="giallo-l"><span>fn map(_filename: &amp;String, content: String) -&gt; Vec&lt;KeyValue&gt; {</span></span>
+<span class="giallo-l"><span>    // Split content into words, each with count 1</span></span>
+<span class="giallo-l"><span>    let mut d: Vec&lt;(&amp;str, u32)&gt; = content.split(&quot; &quot;).map(|x| (x, 1)).collect();</span></span>
+<span class="giallo-l"><span>    d.sort_by_key(|f| f.0);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Group by key and reduce (count occurrences)</span></span>
+<span class="giallo-l"><span>    let mut kvs = Vec::new();</span></span>
+<span class="giallo-l"><span>    let mut i = 0;</span></span>
+<span class="giallo-l"><span>    while i &lt; d.len() {</span></span>
+<span class="giallo-l"><span>        let key = d[i].0;</span></span>
+<span class="giallo-l"><span>        let mut values = Vec::new();</span></span>
+<span class="giallo-l"><span>        while i &lt; d.len() &amp;&amp; key == d[i].0 {</span></span>
+<span class="giallo-l"><span>            values.push(d[i].1);</span></span>
+<span class="giallo-l"><span>            i += 1;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        let result = reduce(key.to_string(), values);</span></span>
+<span class="giallo-l"><span>        let kv = result.split_once(&quot; &quot;)</span></span>
+<span class="giallo-l"><span>            .map(|(k, v)| KeyValue { key: k.to_string(), value: v.to_string() })</span></span>
+<span class="giallo-l"><span>            .expect(&quot;Unable to Convert to key Value form&quot;);</span></span>
+<span class="giallo-l"><span>        kvs.push(kv);</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    kvs</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>For input "hello world hello", this produces:</p>
+<ul>
+<li>("hello", "2")</li>
+<li>("world", "1")</li>
+</ul>
+<h4 id="partitioning-the-hash-function">Partitioning: The Hash Function</h4>
+<p>The worker must now decide which Reduce partition should handle each key. This uses consistent hashing:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/worker.rs</span></span>
+<span class="giallo-l"><span>pub fn ihash(key: &amp;str) -&gt; u32 {</span></span>
+<span class="giallo-l"><span>    let mut hasher = DefaultHasher::new();</span></span>
+<span class="giallo-l"><span>    key.hash(&amp;mut hasher);</span></span>
+<span class="giallo-l"><span>    hasher.finish() as u32</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// In the Map task execution:</span></span>
+<span class="giallo-l"><span>let partition_id = ihash(&amp;kv.key) % data.n_reduce;</span></span></code></pre>
+<p>All occurrences of "hello" will hash to the same partition, ensuring they're processed together in Reduce.</p>
+<h4 id="atomic-file-writing">Atomic File Writing</h4>
+<p>Workers write intermediate files using atomic operations:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// Write to temp file first</span></span>
+<span class="giallo-l"><span>let temp_filename = format!(&quot;{}/mr-{}-{}.tmp&quot;, output_path, task_id, partition_id);</span></span>
+<span class="giallo-l"><span>let final_filename = format!(&quot;{}/mr-{}-{}&quot;, output_path, task_id, partition_id);</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>let mut file = File::create(&amp;temp_filename)?;</span></span>
+<span class="giallo-l"><span>for v in &amp;values {</span></span>
+<span class="giallo-l"><span>    writeln!(file, &quot;{}&quot;, v)?;</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"><span>file.flush()?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Atomic rename - either fully written or not visible</span></span>
+<span class="giallo-l"><span>fs::rename(&amp;temp_filename, &amp;final_filename)?;</span></span></code></pre>
+<p>The key insight: writing to a temporary file and then renaming is atomic on most filesystems. If the worker crashes mid-write, the original file remains intact.</p>
+<h3 id="chapter-8-the-reduce-phase">Chapter 8: The Reduce Phase</h3>
+<h4 id="collecting-intermediate-files">Collecting Intermediate Files</h4>
+<p>Reduce workers receive a list of intermediate files from the Master:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/master.rs - when assigning reduce task</span></span>
+<span class="giallo-l"><span>let mut input_files = Vec::new();</span></span>
+<span class="giallo-l"><span>for (_map_id, files) in &amp;self.map_outputs {</span></span>
+<span class="giallo-l"><span>    if let Some(file) = files.get(&amp;id) {</span></span>
+<span class="giallo-l"><span>        input_files.push(file.clone());</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This is the "shuffle" phase—each Reduce task gets ALL intermediate files for its partition.</p>
+<h4 id="sorting-and-aggregation">Sorting and Aggregation</h4>
+<p>The Reduce worker reads all intermediate files, sorts by key, and aggregates:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// From src/worker.rs</span></span>
+<span class="giallo-l"><span>// Read all input files into a single vector</span></span>
+<span class="giallo-l"><span>let mut all_kv: Vec&lt;(String, u32)&gt; = Vec::new();</span></span>
+<span class="giallo-l"><span>for file in &amp;data.input_files {</span></span>
+<span class="giallo-l"><span>    let content = read_to_string(file)?;</span></span>
+<span class="giallo-l"><span>    for item in content.split(&quot;;&quot;) {</span></span>
+<span class="giallo-l"><span>        if let Some((k, v)) = item.split_once(&quot;,&quot;) {</span></span>
+<span class="giallo-l"><span>            if !k.is_empty() {</span></span>
+<span class="giallo-l"><span>                all_kv.push((k.to_string(), v.parse().unwrap_or(0)));</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Sort by key</span></span>
+<span class="giallo-l"><span>all_kv.sort_by_key(|f| f.0.clone());</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// Aggregate: group by key, sum values</span></span>
+<span class="giallo-l"><span>let mut i = 0;</span></span>
+<span class="giallo-l"><span>while i &lt; all_kv.len() {</span></span>
+<span class="giallo-l"><span>    let key = all_kv[i].0.clone();</span></span>
+<span class="giallo-l"><span>    let mut values = Vec::new();</span></span>
+<span class="giallo-l"><span>    while i &lt; all_kv.len() &amp;&amp; key == all_kv[i].0 {</span></span>
+<span class="giallo-l"><span>        values.push(all_kv[i].1);</span></span>
+<span class="giallo-l"><span>        i += 1;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    let result = reduce(key, values);</span></span>
+<span class="giallo-l"><span>    writeln!(file, &quot;{}&quot;, result)?;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This is the classic "sort-merge" pattern: data is sorted by key, then a single pass groups and aggregates identical keys.</p>
+<hr />
+<h2 id="part-iv-the-complete-system">PART IV: The Complete System</h2>
+<h3 id="chapter-9-the-code-architecture">Chapter 9: The Code Architecture</h3>
+<h4 id="module-structure">Module Structure</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>src/</span></span>
+<span class="giallo-l"><span>├── lib.rs          # Public API - re-exports all modules</span></span>
+<span class="giallo-l"><span>├── master.rs       # Master implementation - scheduling, fault tolerance</span></span>
+<span class="giallo-l"><span>├── worker.rs       # Worker implementation - map/reduce logic</span></span>
+<span class="giallo-l"><span>├── rpc.rs          # RPC types - requests, responses, task status</span></span>
+<span class="giallo-l"><span>├── models.rs       # Domain models - KeyValue, Report</span></span>
+<span class="giallo-l"><span>├── server.rs       # gRPC server - tonic service implementation</span></span>
+<span class="giallo-l"><span>└── client.rs       # gRPC client - worker side RPC calls</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>bin/</span></span>
+<span class="giallo-l"><span>├── master.rs       # Master binary entry point</span></span>
+<span class="giallo-l"><span>└── worker.rs       # Worker binary entry point</span></span></code></pre><h4 id="separation-of-concerns">Separation of Concerns</h4>
+<p>The architecture follows clean separation:</p>
+<ol>
+<li><strong>rpc.rs</strong> defines the communication contract</li>
+<li><strong>master.rs</strong> implements scheduling logic</li>
+<li><strong>worker.rs</strong> implements data processing</li>
+<li><strong>server.rs</strong> / <strong>client.rs</strong> handle gRPC boilerplate</li>
+</ol>
+<p>This makes the code testable and maintainable. The Master logic can be tested without network calls; the Worker can run locally without a Master.</p>
+<h3 id="chapter-10-running-the-system">Chapter 10: Running the System</h3>
+<h4 id="starting-the-master">Starting the Master</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>cargo run --release --bin master 50051</span></span></code></pre>
+<p>The Master starts on port 50051 with the default configuration:</p>
+<ul>
+<li>Input files: input/file1.txt through input/file5.txt</li>
+<li>Number of reduce tasks: 5</li>
+<li>Output directory: output/</li>
+</ul>
+<h4 id="starting-workers">Starting Workers</h4>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>cargo run --release --bin worker http://127.0.0.1:50051</span></span></code></pre>
+<p>Workers connect to the Master and automatically pick up tasks. Start multiple workers to see parallel execution:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span># Terminal 1</span></span>
+<span class="giallo-l"><span>cargo run --release --bin master 50051</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Terminal 2</span></span>
+<span class="giallo-l"><span>cargo run --release --bin worker http://127.0.0.1:50051</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Terminal 3</span></span>
+<span class="giallo-l"><span>cargo run --release --bin worker http://127.0.0.1:50051</span></span></code></pre>
+<p>The log output shows the system in action:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span># Master logs:</span></span>
+<span class="giallo-l"><span>INFO mapreduce::server: gRPC Master listening on 127.0.0.1:50051</span></span>
+<span class="giallo-l"><span>INFO mapreduce::master: All map tasks complete, switching to Reduce phase</span></span>
+<span class="giallo-l"><span>INFO mapreduce::master: All reduce tasks complete, job finished!</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Worker logs:</span></span>
+<span class="giallo-l"><span>INFO mapreduce::worker: Asking for task...</span></span>
+<span class="giallo-l"><span>INFO mapreduce::worker: Map task 0 complete, sending MapDone...</span></span>
+<span class="giallo-l"><span>INFO mapreduce::worker: Asking for task...</span></span>
+<span class="giallo-l"><span>INFO mapreduce::worker: Reduce task 2 complete, sending ReduceDone...</span></span></code></pre><h3 id="chapter-11-the-final-architecture-diagram">Chapter 11: The Final Architecture Diagram</h3>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                         Master                                  │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────┐  ┌──────────────┐  ┌─────────────────────────┐│</span></span>
+<span class="giallo-l"><span>│  │ Task Queue  │  │ Health Check │  │ Phase Transitions       ││</span></span>
+<span class="giallo-l"><span>│  │ - Map 0-4   │  │ Every 10s    │  │ Map → Reduce → Done     ││</span></span>
+<span class="giallo-l"><span>│  │ - Reduce 0-4│  │              │  │                         ││</span></span>
+<span class="giallo-l"><span>│  └─────────────┘  └──────────────┘  └─────────────────────────┘│</span></span>
+<span class="giallo-l"><span>│          │                │                      │              │</span></span>
+<span class="giallo-l"><span>│          ▼                ▼                      ▼              │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────────────────────────────┐│</span></span>
+<span class="giallo-l"><span>│  │                    gRPC Server (tonic)                       ││</span></span>
+<span class="giallo-l"><span>│  │  - get_task() → TaskResponse                                ││</span></span>
+<span class="giallo-l"><span>│  │  - map_done(MapDoneRequest) → Empty                        ││</span></span>
+<span class="giallo-l"><span>│  │  - reduce_done(ReduceDoneRequest) → Empty                   ││</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────────────────────────────┘│</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span>
+<span class="giallo-l"><span>         │                    │                    │</span></span>
+<span class="giallo-l"><span>         ▼                    ▼                    ▼</span></span>
+<span class="giallo-l"><span>┌─────────────────┐  ┌─────────────────┐  ┌─────────────────┐</span></span>
+<span class="giallo-l"><span>│    Worker 1     │  │    Worker 2     │  │    Worker 3     │</span></span>
+<span class="giallo-l"><span>│  ┌───────────┐  │  │  ┌───────────┐  │  │  ┌───────────┐  │</span></span>
+<span class="giallo-l"><span>│  │ Map Phase │  │  │  │ Map Phase │  │  │  │   Idle    │  │</span></span>
+<span class="giallo-l"><span>│  │ Read file │  │  │  │ Read file │  │  │  └───────────┘  │</span></span>
+<span class="giallo-l"><span>│  │ Partition │  │  │  │ Partition │  │  │                  │</span></span>
+<span class="giallo-l"><span>│  └───────────┘  │  │  └───────────┘  │  │                  │</span></span>
+<span class="giallo-l"><span>└─────────────────┘  └─────────────────┘  └─────────────────┘</span></span>
+<span class="giallo-l"><span>         │                    │                    │</span></span>
+<span class="giallo-l"><span>         ▼                    ▼                    ▼</span></span>
+<span class="giallo-l"><span>    output/mr-0-*       output/mr-1-*          (waiting)</span></span></code></pre>
+<hr />
+<h2 id="epilogue-the-rust-advantage">Epilogue: The Rust Advantage</h2>
+<h3 id="why-rust-for-distributed-systems">Why Rust for Distributed Systems?</h3>
+<p>Building this in Rust provided several advantages:</p>
+<ol>
+<li><strong>Memory Safety</strong>: No segfaults or data races, even with concurrent workers</li>
+<li><strong>Async/Await</strong>: Tonic's async gRPC fits naturally with tokio's cooperative multitasking</li>
+<li><strong>Type Safety</strong>: The compiler catches mistakes that would slip through in other languages</li>
+</ol>
+<h3 id="what-this-journey-taught-me">What This Journey Taught Me</h3>
+<p>The MapReduce paper is 20 years old, but the lessons remain:</p>
+<ol>
+<li><strong>Abstraction simplifies complexity</strong>: The Map/Reduce split hides enormous complexity behind simple function signatures</li>
+<li><strong>Fault tolerance is an afterthought in design, a first-thought in implementation</strong>: Every line of code assumes things will fail</li>
+<li><strong>Small, focused components</strong>: The Master doesn't process data; it only coordinates. Workers don't coordinate; they only process. This separation makes each piece understandable</li>
+<li><strong>The power of streaming</strong>: Both Map and Reduce are streaming transformations—they don't need to hold all data in memory</li>
+</ol>
+<h3 id="the-code">The Code</h3>
+<p>This implementation is available on GitHub:</p>
+<p><strong>Repository</strong>: <a rel="external" href="https://github.com/ygndotgg/map_reduce-">https://github.com/ygndotgg/map_reduce-</a></p>
+<p>The commit history tells the story of evolution:</p>
+<ul>
+<li>TCP sockets → gRPC migration</li>
+<li>Sequential → Concurrent workers</li>
+<li>Basic task scheduling → Backup task speculation</li>
+<li>Health checks for fault tolerance</li>
+</ul>
+<h3 id="final-thoughts">Final Thoughts</h3>
+<p>Building a distributed system from scratch is humbling. Every "simple" operation—reading a file, sending a message, updating state—becomes a source of potential failure. But that's exactly why it's worth doing.</p>
+<p>You don't build distributed systems because they're easy. You build them because they force you to think clearly about failure, concurrency, and coordination. And you won't truly understand those concepts until you've implemented them yourself.</p>
+<p>So go ahead—fork the repo, break things, add features. The best way to learn is by doing.</p>
+<hr />
+<p><em>MapReduce in Rust: A Hands-On Guide to Building Distributed Systems from Scratch | my thoughts</em></p>
+
+        
+    </article>
+
+    <!-- Comment section -->
+    
+      
+        
+          <script
+  src="https://giscus.app/client.js"
+  data-repo="ygndotgg&#x2F;ygndotgg.github.io"
+  data-repo-id="R_kgDORbe62A"
+  data-category="General"
+  data-category-id="DIC_kwDORbe62M4C3cVZ"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+
+  
+  data-theme="preferred_color_scheme"
+  
+
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+
+        
+      
+    
+
+
+    <!-- Page footer -->
+    
+    <footer>
+        <hr>
+        <p>
+            
+            
+                
+                in <a href="https://ygndotgg.github.io/categories/rust/">rust</a>
+            
+            
+                and
+                tagged
+                
+                    <a href="https://ygndotgg.github.io/tags/rust/">rust</a>
+                    
+                        
+                            
+                                ,
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/distributed-systems/">distributed-systems</a>
+                    
+                        
+                            
+                                and
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/mapreduce/">mapreduce</a>
+                    
+                        
+                    
+                
+            
+        </p>
+
+        <!-- Revision history (optional) -->
+        
+          
+            
+              
+            
+          
+        
+
+        
+        
+    </footer>
+
+
+</article>
+
+
+    </main>
+    
+
+  </body>
+</html>

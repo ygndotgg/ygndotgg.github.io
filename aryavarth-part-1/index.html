@@ -1,0 +1,1130 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
+
+    <!-- Enable responsiveness on mobile devices -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    
+      
+        <meta name="description" content="Personal blog about programming and tech" />
+        <meta property="og:description" content="Personal blog about programming and tech" />
+        <meta property="twitter:description" content="Personal blog about programming and tech" />
+      
+    
+
+    <!-- Title -->
+    
+      
+    
+    <title>
+    
+    Aryavarth: Distributed Key Value Store Part 1
+    
+</title>
+
+    <!-- Additional Facebook Meta Tags -->
+    <meta property="og:site_name" content="YGN&#x27;s Blog" />
+    <meta
+      property="og:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;aryavarth-part-1&#x2F;"
+    />
+    <meta
+      property="og:type"
+      content="article"
+    />
+    <meta property="og:title" content="Aryavarth: Distributed Key Value Store Part 1" />
+
+    <!-- Additional Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      property="twitter:url"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;aryavarth-part-1&#x2F;"
+    />
+    <meta name="twitter:title" content="Aryavarth: Distributed Key Value Store Part 1" />
+
+    <!-- Additional Fediverse Tags -->
+     
+
+    <!-- Cover images -->
+    
+    
+
+    <meta
+      property="og:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <meta
+      name="twitter:image"
+      content="https:&#x2F;&#x2F;ygndotgg.github.io&#x2F;icons&#x2F;favicon&#x2F;web-app-manifest-512x512.png"
+    />
+
+    <!-- Favicons -->
+    
+    <link
+      rel="icon"
+      type="image/png"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon-96x96.png"
+      sizes="96x96"
+    />
+    <link
+      rel="icon"
+      type="image/svg+xml"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.svg"
+    />
+    <link
+      rel="shortcut icon"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/favicon.ico"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/apple-touch-icon.png"
+    />
+    <meta name="apple-mobile-web-app-title" content="Aryavarth: Distributed Key Value Store Part 1" />
+    <link
+      rel="manifest"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/icons/favicon/site.webmanifest"
+    />
+    
+
+    <!-- RSS Feed -->
+    
+    <link
+      rel="alternate"
+      type="application/atom+xml"
+      title="RSS"
+      href="https://ygndotgg.github.io/atom.xml"
+    />
+    
+
+    <!-- Load Styles -->
+    
+      <link
+        rel="stylesheet"
+        href="https://ygndotgg.github.io/site.css"
+      />
+    
+
+    <!-- Syntax highlighting theming (giallo) -->
+    <link id="giallo-dark" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-dark.css"
+      media="(prefers-color-scheme: dark)"
+    />
+    <link id="giallo-light" rel="stylesheet" type="text/css"
+      href="https:&#x2F;&#x2F;ygndotgg.github.io/giallo-light.css"
+      media="(prefers-color-scheme: light)"
+    />
+
+    <!-- Load Fonts -->
+    
+
+  
+
+
+
+
+
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap" rel="stylesheet">
+  
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap" rel="stylesheet">
+  
+
+
+
+<!-- Forcing Font -->
+<style>
+body {
+  font-family:
+    "JetBrains Mono", Menlo, Monaco, Lucida Console, Liberation Mono,
+    DejaVu Sans Mono, Bitstream Vera Sans Mono, Courier New,
+    monospace, serif !important;
+}
+</style>
+
+
+    <!-- Pass Theme Preference as Data Attribute -->
+    <script src="https://ygndotgg.github.io/js/init-theme.js"></script>
+
+    <!-- Additional scripts -->
+    
+      
+      
+        <script src="https://ygndotgg.github.io/js/toggle-theme.js"></script>
+      
+      
+
+      
+  <script type="text/javascript" src="https://ygndotgg.github.io/elasticlunr.min.js"></script>
+  <script type="text/javascript" src="https://ygndotgg.github.io/js/search.js"></script>
+
+
+    
+  </head>
+
+  <!-- Body element (contents of the page) -->
+  <body class="hack main container">
+    
+  
+    
+    
+      
+  
+  <section class="nav-header">
+    <nav
+      itemscope
+      itemtype="http://schema.org/SiteNavigationElement"
+      class="navbar"
+    >
+      <section class="nav-links">
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io"
+        >
+          <span itemprop="name">Home</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/categories"
+        >
+          <span itemprop="name">Categories</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://ygndotgg.github.io/tags"
+        >
+          <span itemprop="name">Tags</span>
+        </a>
+        
+        <a
+          itemprop="url"
+          class=""
+          href="https://gaganyt.vercel.app"
+        >
+          <span itemprop="name">Portfolio</span>
+        </a>
+        
+      </section>
+    </nav>
+    <aside class="user-actions-container">
+      
+      <section class="search-container">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke-width="1.5"
+          class="search-icon"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+          />
+        </svg>
+        <input type="text" id="search" placeholder="Search..." />
+        <img
+          src="https://ygndotgg.github.io/icons/slash-square.svg"
+          id="slash-icon"
+          class="slash-icon"
+          alt="Press / to search"
+        />
+      </section>
+       
+      <a id="dark-mode-toggle" href="#">
+        <img
+          src="https://ygndotgg.github.io/icons/sun.svg"
+          id="sun-icon"
+          class="invert-icon"
+          alt="Light mode"
+        />
+        <img
+          src="https://ygndotgg.github.io/icons/moon.svg"
+          id="moon-icon"
+          alt="Dark mode"
+        />
+      </a>
+       
+      <a
+        href="https://ygndotgg.github.io/atom.xml"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/rss.svg"
+          id="rss-icon"
+          alt="RSS feed"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;github.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/github.svg"
+          id="github-icon"
+          alt="GitHub"
+          class="social-icon"
+        />
+      </a>
+       
+      <a
+        href="https:&#x2F;&#x2F;x.com&#x2F;ygndotgg"
+        class="feed-icon"
+        rel="noopener noreferrer"
+      >
+        <img
+          src="https://ygndotgg.github.io/icons/mastodon.svg"
+          id="mastodon-icon"
+          alt="Mastodon"
+          class="social-icon"
+        />
+      </a>
+      
+    </aside>
+  </section>
+  
+  <!-- Search modal overlay and results (positioned globally) -->
+  <section class="search-backdrop"></section>
+  <dialog class="search-results" aria-live="polite">
+    <article class="search-modal-header">
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+        stroke-width="1.5"
+        class="search-modal-icon"
+      >
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z"
+        />
+      </svg>
+      <input type="text" id="search-modal" placeholder="Search..." />
+    </article>
+    <article class="search-results-count" id="search-results-count"></article>
+    <article class="search-results__items" role="list"></article>
+    <footer class="search-modal-footer">
+      <span><kbd>↑</kbd><kbd>↓</kbd> to navigate</span>
+      <span><kbd>↵ </kbd> to select</span>
+      <span><kbd>esc</kbd> to close</span>
+    </footer>
+  </dialog>
+  
+  
+
+    
+
+
+    <main>
+      
+
+<article itemscope itemtype="http://schema.org/BlogPosting">
+    <header>
+        <h1 itemprop="headline">Aryavarth: Distributed Key Value Store Part 1</h1>
+        <data class="muted">
+    <svg class="icon i-clock" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <circle cx="16" cy="16" r="14"/>
+        <path d="M16 8 L16 16 20 20"/>
+    </svg>
+    <data>8 minute read</data>
+    <svg class="icon i-edit" viewBox="0 0 32 32"
+         width="16" height="16" fill="none" stroke="currentcolor"
+         stroke-linecap="round" stroke-linejoin="round" stroke-width="6.25%">
+        <path d="M30 7 L25 2 5 22 3 29 10 27 Z M21 6 L26 11 Z M5 22 L10 27 Z"/>
+    </svg>
+
+    Published: 2025-02-05
+</data>
+    </header>
+
+    <article itemprop="articleBody">
+        
+            <!-- If no summary separate from content, just render content -->
+            <h1 id="aryavarth-distributed-key-value-store-part-1">Aryavarth: Distributed Key Value Store - Part 1</h1>
+<p><em>"Just use Redis!" everyone tells you. "Why reinvent the wheel?"</em></p>
+<p>That's what everyone says when you mention building your own storage engine. The world is full of databases—Redis, PostgreSQL, MongoDB, Cassandra. Why would anyone in their right mind build yet another key-value store from scratch?</p>
+<p>But honestly, they are WRONG. Understanding how storage engines work under the hood is fundamental to becoming a better engineer. You can't optimize what you don't understand.</p>
+<p>NOTE: This is Part 1 of a technical deep-dive into Aryavarth, a distributed key-value store being built from first principles in Rust. This part covers the foundational single-node storage engine (KVS1). For the complete code implementation, see <a rel="external" href="https://github.com/ygndotgg/kvs_store">src/kvs.rs</a>. Check the commit history for the actual implementation details. We will cover append-only logs, in-memory indexes, compaction strategies, and the architecture of persistent storage.</p>
+<h2 id="what-this-post-covers">What This Post Covers</h2>
+<ul>
+<li><strong><a href="/aryavarth-part-1/#part-i-the-foundation">Part I: The Foundation</a></strong> - Understanding log-structured storage and why append-only is revolutionary</li>
+<li><strong><a href="/aryavarth-part-1/#part-ii-the-index-problem">Part II: The Index Problem</a></strong> - Building an in-memory index that makes reads fast</li>
+<li><strong><a href="/aryavarth-part-1/#part-iii-the-compaction-challenge">Part III: The Compaction Challenge</a></strong> - Managing disk space without losing data</li>
+<li><strong><a href="/aryavarth-part-1/#part-iv-the-complete-architecture">Part IV: The Complete Architecture</a></strong> - Putting it all together in Rust</li>
+</ul>
+<hr />
+<h2 id="prologue-where-does-it-all-started">Prologue: Where Does it All Started</h2>
+<p>It started with a benchmark.</p>
+<p>A few months ago, I took on the 1BRC (One Billion Row Challenge) in Rust. The goal was simple: process one billion temperature readings and compute statistics like mean, min, and max per station—as fast as possible.</p>
+<p>Building that taught me something profound: <strong>the foundation of every high-performance system is understanding your data layout and access patterns</strong>.</p>
+<p>The ceiling I hit was this: my 1BRC implementation could process data blazingly fast locally, but what if I wanted to distribute this across multiple machines? What if the dataset was too large for a single machine?</p>
+<p>That's when it hit me—I needed distributed storage. And to understand distributed storage, I needed to understand local storage first.</p>
+<p>So I started with the simplest possible storage mechanism: a log-structured key-value store called KVS1.</p>
+<p>But here's the thing—I didn't want just any key-value store. I wanted one that taught me something. That's why I chose log-structured storage.</p>
+<hr />
+<h2 id="part-i-the-foundation-of-log-structured-storage">PART I: The Foundation of Log-Structured Storage</h2>
+<h3 id="chapter-1-the-append-only-problem">Chapter 1: The Append-Only Problem</h3>
+<p>Let me ask you a question: When you store data, what's the most fundamental operation?</p>
+<p>It's not reading. Reading is easy—you just look up where you put something.</p>
+<p>The hard part is writing. Specifically, writing efficiently while maintaining durability.</p>
+<p>Here's the naive approach most people take: Open a file, seek to the right position, overwrite the data. This is called <strong>random-write storage</strong>, and it's deceptively problematic.</p>
+<h4 id="the-random-write-problem">The Random-Write Problem</h4>
+<p>Imagine you're building a database. You have a file with existing data:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Position: 0    100   200   300   400   500</span></span>
+<span class="giallo-l"><span>          ┌─────┬─────┬─────┬─────┬─────┐</span></span>
+<span class="giallo-l"><span>Data:     │ A   │ B   │ C   │ D   │ E   │</span></span>
+<span class="giallo-l"><span>          └─────┴─────┴─────┴─────┴─────┘</span></span></code></pre>
+<p>Now you want to update key "C" (at position 200) with new data that's larger than the original. What do you do?</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>Options:</span></span>
+<span class="giallo-l"><span>1. Overwrite in place - OVERFLOW! Data spills into D&#39;s space</span></span>
+<span class="giallo-l"><span>2. Seek to end - But now C is at wrong position</span></span>
+<span class="giallo-l"><span>3. Rewrite entire file - Expensive!</span></span></code></pre>
+<p>This is the <strong>update-in-place problem</strong>. It's why traditional databases use complex structures like B-trees—they need to manage these overflows, which adds massive complexity.</p>
+<h4 id="the-solution-append-only-logs">The Solution: Append-Only Logs</h4>
+<p>Here's where log-structured storage changes everything. What if we never modified existing data? What if we only ever appended new data?</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│         APPEND-ONLY LOG STRATEGY                        │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                         │</span></span>
+<span class="giallo-l"><span>│  Time 1: SET key1=&quot;hello&quot;                             │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────┐               │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key1&quot;,&quot;value&quot;:&quot;hello&quot;}         │</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────┘               │</span></span>
+<span class="giallo-l"><span>│                                                         │</span></span>
+<span class="giallo-l"><span>│  Time 2: SET key2=&quot;world&quot;                             │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────┐               │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key1&quot;,&quot;value&quot;:&quot;hello&quot;}         │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key2&quot;,&quot;value&quot;:&quot;world&quot;}         │</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────┘               │</span></span>
+<span class="giallo-l"><span>│                                                         │</span></span>
+<span class="giallo-l"><span>│  Time 3: SET key1=&quot;updated&quot; (UPDATE!)                  │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────┐               │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key1&quot;,&quot;value&quot;:&quot;hello&quot;}         │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key2&quot;,&quot;value&quot;:&quot;world&quot;}         │</span></span>
+<span class="giallo-l"><span>│  │ {&quot;cmd&quot;:&quot;set&quot;,&quot;key&quot;:&quot;key1&quot;,&quot;value&quot;:&quot;updated&quot;}       │</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────┘               │</span></span>
+<span class="giallo-l"><span>│                                                         │</span></span>
+<span class="giallo-l"><span>│  Note: Old &quot;key1&quot; entry is NOT modified, just ignored  │</span></span>
+<span class="giallo-l"><span>│                                                         │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────┘</span></span></code></pre>
+<p>This is revolutionary. Here's why:</p>
+<ol>
+<li><strong>Writes are always sequential</strong> - No seeking, no random I/O. Just append to the end.</li>
+<li><strong>No corruption from partial writes</strong> - If the system crashes mid-write, the old data is still intact.</li>
+<li><strong>Crash recovery is trivial</strong> - Just replay the log from the beginning.</li>
+</ol>
+<p>The tradeoff? Over time, your log grows forever with stale data. But that's a problem we'll solve with compaction.</p>
+<hr />
+<h3 id="chapter-2-the-language-agnostic-core">Chapter 2: The Language-Agnostic Core</h3>
+<p>Let me show you the core concepts in any language. Here's the pseudocode for a log-structured key-value store:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>class LogStore:</span></span>
+<span class="giallo-l"><span>    def __init__(self, directory):</span></span>
+<span class="giallo-l"><span>        self.directory = directory</span></span>
+<span class="giallo-l"><span>        self.in_memory_index = {}  # Maps key -&gt; (file_id, offset, length)</span></span>
+<span class="giallo-l"><span>        self.current_file = 0</span></span>
+<span class="giallo-l"><span>        self.open_file()</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    def open_file(self):</span></span>
+<span class="giallo-l"><span>        # Open next available log file for appending</span></span>
+<span class="giallo-l"><span>        self.file = open(f&quot;{directory}/{current_file}.log&quot;, &quot;a&quot;)</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    def set(self, key, value):</span></span>
+<span class="giallo-l"><span>        # Serialize the command as JSON</span></span>
+<span class="giallo-l"><span>        entry = JSON.stringify({</span></span>
+<span class="giallo-l"><span>            &quot;cmd&quot;: &quot;set&quot;,</span></span>
+<span class="giallo-l"><span>            &quot;key&quot;: key,</span></span>
+<span class="giallo-l"><span>            &quot;value&quot;: value</span></span>
+<span class="giallo-l"><span>        })</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        # Get current position (where we&#39;re appending)</span></span>
+<span class="giallo-l"><span>        offset = self.file.tell()</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        # Write the entry</span></span>
+<span class="giallo-l"><span>        self.file.write(entry + &quot;\n&quot;)</span></span>
+<span class="giallo-l"><span>        self.file.flush()</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        # Update our in-memory index</span></span>
+<span class="giallo-l"><span>        self.in_memory_index[key] = {</span></span>
+<span class="giallo-l"><span>            &quot;file_id&quot;: self.current_file,</span></span>
+<span class="giallo-l"><span>            &quot;offset&quot;: offset,</span></span>
+<span class="giallo-l"><span>            &quot;length&quot;: len(entry)</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        # Check if we need to rotate files</span></span>
+<span class="giallo-l"><span>        if self.file.size &gt; MAX_SIZE:</span></span>
+<span class="giallo-l"><span>            self.current_file += 1</span></span>
+<span class="giallo-l"><span>            self.open_file()</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    def get(self, key):</span></span>
+<span class="giallo-l"><span>        # Look up where the data is</span></span>
+<span class="giallo-l"><span>        location = self.in_memory_index.get(key)</span></span>
+<span class="giallo-l"><span>        if not location:</span></span>
+<span class="giallo-l"><span>            return None  # Key doesn&#39;t exist</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        # Read the specific bytes from the file</span></span>
+<span class="giallo-l"><span>        with open(f&quot;{directory}/{location.file_id}.log&quot;) as f:</span></span>
+<span class="giallo-l"><span>            f.seek(location.offset)</span></span>
+<span class="giallo-l"><span>            data = f.read(location.length)</span></span>
+<span class="giallo-l"><span>            entry = JSON.parse(data)</span></span>
+<span class="giallo-l"><span>            return entry[&quot;value&quot;]</span></span></code></pre>
+<p>This is language-agnostic. You could implement this in Python, Go, JavaScript, or any language. The concepts are universal.</p>
+<p>Now let me show you how this translates to actual Rust code. For the complete implementation, see <code>src/kvs.rs</code>.</p>
+<hr />
+<h2 id="part-ii-the-index-problem">PART II: The Index Problem</h2>
+<h3 id="chapter-3-the-memory-index-architecture">Chapter 3: The Memory Index Architecture</h3>
+<p>Here's a critical insight: <strong>the log stores data, but the index makes it fast</strong>.</p>
+<p>Without an index, to find a key, you'd have to scan through the entire log from the beginning. With millions of entries, that's unacceptable.</p>
+<p>We need an in-memory index that maps keys to their locations in the log files.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                    DUAL-LAYER STORAGE                          │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│   LAYER 1: In-Memory Index (HashMap)                          │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────┐      │</span></span>
+<span class="giallo-l"><span>│   │  key1  ──▶ {file_id: 0, offset: 0,   len: 45}       │      │</span></span>
+<span class="giallo-l"><span>│   │  key2  ──▶ {file_id: 0, offset: 45,  len: 38}       │      │</span></span>
+<span class="giallo-l"><span>│   │  key3  ──▶ {file_id: 1, offset: 0,   len: 52}       │      │</span></span>
+<span class="giallo-l"><span>│   │  key4  ──▶ {file_id: 1, offset: 52,  len: 29}       │      │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────────────────────────────────┘      │</span></span>
+<span class="giallo-l"><span>│                         │                                       │</span></span>
+<span class="giallo-l"><span>│                         ▼                                        │</span></span>
+<span class="giallo-l"><span>│   LAYER 2: Disk Storage (Log Files)                            │</span></span>
+<span class="giallo-l"><span>│   ┌──────────────────────┐  ┌──────────────────────┐          │</span></span>
+<span class="giallo-l"><span>│   │   0.log              │  │   1.log              │          │</span></span>
+<span class="giallo-l"><span>│   │ ┌─────────────────┐ │  │ ┌─────────────────┐ │          │</span></span>
+<span class="giallo-l"><span>│   │ │{set,key1,hello} │ │  │ │{set,key3,foo}   │ │          │</span></span>
+<span class="giallo-l"><span>│   │ │{set,key2,world} │ │  │ │{set,key4,bar}   │ │          │</span></span>
+<span class="giallo-l"><span>│   │ └─────────────────┘ │  │ └─────────────────┘ │          │</span></span>
+<span class="giallo-l"><span>│   └──────────────────────┘  └──────────────────────┘          │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<p>This architecture gives us:</p>
+<ul>
+<li><strong>O(1) lookups</strong> - The HashMap provides instant access to any key</li>
+<li><strong>Sequential writes</strong> - All writes go to the end of the current log file</li>
+<li><strong>Crash safety</strong> - The log is the source of truth; the index is just a cache</li>
+</ul>
+<h3 id="chapter-4-implementation-in-rust">Chapter 4: Implementation in Rust</h3>
+<p>Now let's look at the actual Rust implementation. Here's how the index and log work together:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// The in-memory index entry - tracks where data lives on disk</span></span>
+<span class="giallo-l"><span>pub struct LogPointer {</span></span>
+<span class="giallo-l"><span>    offset: u32,    // Byte offset within the file</span></span>
+<span class="giallo-l"><span>    len: u32,       // Length of the entry in bytes</span></span>
+<span class="giallo-l"><span>    file_id: u32,   // Which log file contains this entry</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>// The main key-value store</span></span>
+<span class="giallo-l"><span>pub struct KvStore {</span></span>
+<span class="giallo-l"><span>    store: HashMap&lt;String, LogPointer&gt;,  // In-memory index</span></span>
+<span class="giallo-l"><span>    dir: PathBuf,                         // Working directory</span></span>
+<span class="giallo-l"><span>    current_file_id: u32,                 // Current log file ID</span></span>
+<span class="giallo-l"><span>    writer: BufWriter&lt;File&gt;,              // Buffered writer for performance</span></span>
+<span class="giallo-l"><span>    uncompacted_bytes: u32,               // Track stale data for compaction</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<blockquote>
+<p><strong>Note on thresholds</strong>: For testing purposes, I've used small threshold values in the implementation. The <code>MAX_FILE_SIZE</code> is set to 1004 bytes (~1KB) and compaction triggers at 2KB of stale data. In production, you'd use much larger values (e.g., 1GB for file rotation, 256MB for compaction).</p>
+</blockquote>
+<p>The magic happens in the <code>set</code> method:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub fn set(&amp;mut self, key: String, value: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>    // Check if current log file is too big - rotate if needed</span></span>
+<span class="giallo-l"><span>    let file_path = self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, self.current_file_id));</span></span>
+<span class="giallo-l"><span>    let flen = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>        .read(true)</span></span>
+<span class="giallo-l"><span>        .open(&amp;file_path)?</span></span>
+<span class="giallo-l"><span>        .metadata()?</span></span>
+<span class="giallo-l"><span>        .len();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    if flen &gt; MAX_FILE_SIZE {</span></span>
+<span class="giallo-l"><span>        self.writer.flush()?;</span></span>
+<span class="giallo-l"><span>        self.current_file_id += 1;</span></span>
+<span class="giallo-l"><span>        // Create new log file and update writer</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Serialize the command as JSON</span></span>
+<span class="giallo-l"><span>    let ser = serde_json::to_string(&amp;Command::Set {</span></span>
+<span class="giallo-l"><span>        key: key.clone(),</span></span>
+<span class="giallo-l"><span>        value,</span></span>
+<span class="giallo-l"><span>    }).unwrap();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Get current offset (where we&#39;ll write)</span></span>
+<span class="giallo-l"><span>    let offset = self.writer.seek(std::io::SeekFrom::End(0))? as u32;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Actually write to the log</span></span>
+<span class="giallo-l"><span>    writeln!(self.writer, &quot;{}&quot;, ser)?;</span></span>
+<span class="giallo-l"><span>    self.writer.flush()?;</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    // Update the in-memory index with the new location</span></span>
+<span class="giallo-l"><span>    self.store.insert(</span></span>
+<span class="giallo-l"><span>        key,</span></span>
+<span class="giallo-l"><span>        LogPointer {</span></span>
+<span class="giallo-l"><span>            offset,</span></span>
+<span class="giallo-l"><span>            len: (ser.len() + 1) as u32,  // +1 for newline</span></span>
+<span class="giallo-l"><span>            file_id: self.current_file_id,</span></span>
+<span class="giallo-l"><span>        },</span></span>
+<span class="giallo-l"><span>    );</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Ok(())</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This is elegant in its simplicity. Every write:</p>
+<ol>
+<li>Checks if we need to rotate log files</li>
+<li>Appends the JSON command to the log</li>
+<li>Updates the in-memory index</li>
+</ol>
+<p>The index is always in sync with the latest writes because we update it immediately after writing.</p>
+<hr />
+<h3 id="chapter-5-the-get-operation">Chapter 5: The GET Operation</h3>
+<p>Reading is where the index shines. Here's how it works:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub fn get(&amp;mut self, key: String) -&gt; Result&lt;Option&lt;String&gt;&gt; {</span></span>
+<span class="giallo-l"><span>    // O(1) lookup in the hash map</span></span>
+<span class="giallo-l"><span>    let file_loc = self.store.get(&amp;key).unwrap_or_else(|| {</span></span>
+<span class="giallo-l"><span>        println!(&quot;Key not found&quot;);</span></span>
+<span class="giallo-l"><span>        std::process::exit(0);</span></span>
+<span class="giallo-l"><span>    });</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Read only the specific bytes we need</span></span>
+<span class="giallo-l"><span>    let mut buf = vec![0u8; file_loc.len as usize];</span></span>
+<span class="giallo-l"><span>    let mut file = OpenOptions::new().read(true).open(</span></span>
+<span class="giallo-l"><span>        self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, file_loc.file_id)),</span></span>
+<span class="giallo-l"><span>    )?;</span></span>
+<span class="giallo-l"><span>    file.seek(std::io::SeekFrom::Start(file_loc.offset as u64))?;</span></span>
+<span class="giallo-l"><span>    file.read_exact(&amp;mut buf)?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Parse and extract the value</span></span>
+<span class="giallo-l"><span>    let cmd: Command = serde_json::from_slice(&amp;buf).unwrap();</span></span>
+<span class="giallo-l"><span>    match cmd {</span></span>
+<span class="giallo-l"><span>        Command::Set { value, .. } =&gt; return Ok(Some(value)),</span></span>
+<span class="giallo-l"><span>        _ =&gt; Ok(None),</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Notice we:</p>
+<ol>
+<li>Look up the location in O(1) time</li>
+<li>Only read the exact bytes we need (not the whole file)</li>
+<li>Parse just the JSON we retrieved</li>
+</ol>
+<p>This is dramatically faster than scanning the entire log.</p>
+<hr />
+<h2 id="part-iii-the-compaction-challenge">PART III: The Compaction Challenge</h2>
+<h3 id="chapter-6-the-stale-data-problem">Chapter 6: The Stale Data Problem</h3>
+<p>Here's the fundamental problem with append-only logs: they grow forever.</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                 LOG GROWTH OVER TIME                           │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  After 1 day:                                                  │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────┐                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:1&quot;,&quot;Alice&quot;}             │                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:2&quot;,&quot;Bob&quot;}               │                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:3&quot;,&quot;Charlie&quot;}           │  1 MB                │</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────┘                        │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  After 1 week (with updates):                                   │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────────────────────────────┐                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:1&quot;,&quot;Alice&quot;}             │ ◄── STALE             │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:2&quot;,&quot;Bob&quot;}               │                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:3&quot;,&quot;Charlie&quot;}           │ ◄── STALE             │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:1&quot;,&quot;Alice Updated&quot;}    │                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:4&quot;,&quot;Diana&quot;}             │                        │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:3&quot;,&quot;New Charlie&quot;}      │ ◄── STALE             │</span></span>
+<span class="giallo-l"><span>│  │ {set,&quot;user:5&quot;,&quot;Eve&quot;}               │  5 MB                │</span></span>
+<span class="giallo-l"><span>│  └─────────────────────────────────────┘                        │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  Actual live data: only 3 keys!                                  │</span></span>
+<span class="giallo-l"><span>│  Wasted space: 60%!                                             │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span></code></pre>
+<p>In the example above:</p>
+<ul>
+<li>We have 5 log entries</li>
+<li>But only 3 are "live" (the latest version of each key)</li>
+<li>2 entries are stale (older versions that were updated)</li>
+</ul>
+<p>As the system runs, stale data accumulates until most of your disk is wasted.</p>
+<h3 id="chapter-7-the-compaction-solution">Chapter 7: The Compaction Solution</h3>
+<p>Compaction solves this. The idea is simple: periodically create a new log file containing only the live (latest) data, then delete the old files.</p>
+<p>Here's the algorithm:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                      COMPACTION PROCESS                         │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  BEFORE COMPACTION:                                            │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────┐  ┌─────────────┐                              │</span></span>
+<span class="giallo-l"><span>│  │ 0.log       │  │ 1.log       │                              │</span></span>
+<span class="giallo-l"><span>│  │ A=1         │  │ A=2         │  ← Latest A is here          │</span></span>
+<span class="giallo-l"><span>│  │ B=1         │  │ C=1         │  ← Latest C is here          │</span></span>
+<span class="giallo-l"><span>│  │ D=1         │  │             │                              │</span></span>
+<span class="giallo-l"><span>│  └─────────────┘  └─────────────┘                              │</span></span>
+<span class="giallo-l"><span>│  In-memory index: A→1.log, B→0.log, C→1.log, D→0.log          │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  STEP 1: Create new compact file                               │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐             │</span></span>
+<span class="giallo-l"><span>│  │ 0.log       │  │ 1.log       │  │ 2.log (NEW)│             │</span></span>
+<span class="giallo-l"><span>│  │ A=1         │  │ A=2  ✓      │  │ A=2         │             │</span></span>
+<span class="giallo-l"><span>│  │ B=1    ✓    │  │ C=1    ✓    │  │ B=1         │             │</span></span>
+<span class="giallo-l"><span>│  │ D=1    ✓    │  │             │  │ C=1         │             │</span></span>
+<span class="giallo-l"><span>│  └─────────────┘  └─────────────┘  │ D=1         │             │</span></span>
+<span class="giallo-l"><span>│                                   └─────────────┘             │</span></span>
+<span class="giallo-l"><span>│  STEP 2: Rewrite only live entries                            │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  STEP 3: Update index                                         │</span></span>
+<span class="giallo-l"><span>│  In-memory index: A→2.log, B→2.log, C→2.log, D→2.log         │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│  STEP 4: Delete old files                                     │</span></span>
+<span class="giallo-l"><span>│  ┌─────────────┐                                               │</span></span>
+<span class="giallo-l"><span>│  │ 2.log       │  1 MB → 0.5 MB (50% reduction!)             │</span></span>
+<span class="giallo-l"><span>│  │ A=2         │                                               │</span></span>
+<span class="giallo-l"><span>│  │ B=1         │                                               │</span></span>
+<span class="giallo-l"><span>│  │ C=1         │                                               │</span></span>
+<span class="giallo-l"><span>│  │ D=1         │                                               │</span></span>
+<span class="giallo-l"><span>│  └─────────────┘                                               │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span></code></pre><h3 id="chapter-8-the-rust-compaction-implementation">Chapter 8: The Rust Compaction Implementation</h3>
+<p>Here's how KVS1 implements compaction:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub fn compact(&amp;mut self) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>    // Create new compact file with ID after current</span></span>
+<span class="giallo-l"><span>    let compact_file_id = self.current_file_id + 1;</span></span>
+<span class="giallo-l"><span>    let next_file_id = self.current_file_id + 2;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Collect file IDs that are still referenced</span></span>
+<span class="giallo-l"><span>    let old_fileids: HashSet&lt;u32&gt; = </span></span>
+<span class="giallo-l"><span>        self.store.iter().map(|entry| entry.1.file_id).collect();</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Create the compact file</span></span>
+<span class="giallo-l"><span>    let compact_file = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>        .create(true)</span></span>
+<span class="giallo-l"><span>        .read(true)</span></span>
+<span class="giallo-l"><span>        .write(true)</span></span>
+<span class="giallo-l"><span>        .open(self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, compact_file_id)))?;</span></span>
+<span class="giallo-l"><span>    let mut compact_writer = BufWriter::new(compact_file);</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Rewrite only live entries</span></span>
+<span class="giallo-l"><span>    let mut offset = 0;</span></span>
+<span class="giallo-l"><span>    for ptr in self.store.values_mut() {</span></span>
+<span class="giallo-l"><span>        // Read the old entry</span></span>
+<span class="giallo-l"><span>        let mut curr_file = File::open(</span></span>
+<span class="giallo-l"><span>            self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, ptr.file_id))</span></span>
+<span class="giallo-l"><span>        )?;</span></span>
+<span class="giallo-l"><span>        let mut buf = vec![0u8; ptr.len as usize];</span></span>
+<span class="giallo-l"><span>        curr_file.seek(std::io::SeekFrom::Start(ptr.offset as u64))?;</span></span>
+<span class="giallo-l"><span>        curr_file.read_exact(&amp;mut buf)?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Write to compact file</span></span>
+<span class="giallo-l"><span>        compact_writer.write_all(&amp;buf)?;</span></span>
+<span class="giallo-l"><span>        compact_writer.flush()?;</span></span>
+<span class="giallo-l"><span>        </span></span>
+<span class="giallo-l"><span>        // Update the pointer to new location</span></span>
+<span class="giallo-l"><span>        ptr.offset = offset;</span></span>
+<span class="giallo-l"><span>        ptr.len = buf.len() as u32;</span></span>
+<span class="giallo-l"><span>        ptr.file_id = compact_file_id;</span></span>
+<span class="giallo-l"><span>        offset += buf.len() as u32;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Delete old files that are no longer needed</span></span>
+<span class="giallo-l"><span>    for file in old_fileids {</span></span>
+<span class="giallo-l"><span>        let path = self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, file));</span></span>
+<span class="giallo-l"><span>        std::fs::remove_file(path)?;</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Set up writer for next file</span></span>
+<span class="giallo-l"><span>    let next_file = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>        .create(true)</span></span>
+<span class="giallo-l"><span>        .read(true)</span></span>
+<span class="giallo-l"><span>        .write(true)</span></span>
+<span class="giallo-l"><span>        .open(self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, next_file_id)))?;</span></span>
+<span class="giallo-l"><span>    self.writer = BufWriter::new(next_file);</span></span>
+<span class="giallo-l"><span>    self.current_file_id = next_file_id;</span></span>
+<span class="giallo-l"><span>    self.uncompacted_bytes = 0;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    Ok(())</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The compaction is triggered automatically when too much stale data accumulates:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>// After every write, check if we need compaction</span></span>
+<span class="giallo-l"><span>self.uncompacted_bytes += ser.len() as u32;</span></span>
+<span class="giallo-l"><span>if self.uncompacted_bytes &gt; 1024 * 2 {  // 2KB threshold (small for testing)</span></span>
+<span class="giallo-l"><span>    self.compact()?;</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<hr />
+<h2 id="part-iv-the-complete-architecture">PART IV: The Complete Architecture</h2>
+<h3 id="chapter-9-the-system-architecture">Chapter 9: The System Architecture</h3>
+<p>Here's how all the pieces fit together:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>┌─────────────────────────────────────────────────────────────────┐</span></span>
+<span class="giallo-l"><span>│                        KVS1 ARCHITECTURE                       │</span></span>
+<span class="giallo-l"><span>├─────────────────────────────────────────────────────────────────┤</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>│                         CLI Interface                          │</span></span>
+<span class="giallo-l"><span>│                     ┌─────────────────┐                        │</span></span>
+<span class="giallo-l"><span>│                     │ cargo run set   │                        │</span></span>
+<span class="giallo-l"><span>│                     │    key value    │                        │</span></span>
+<span class="giallo-l"><span>│                     └────────┬────────┘                        │</span></span>
+<span class="giallo-l"><span>│                              │                                  │</span></span>
+<span class="giallo-l"><span>│                              ▼                                  │</span></span>
+<span class="giallo-l"><span>│   ┌─────────────────────────────────────────────────────────┐  │</span></span>
+<span class="giallo-l"><span>│   │                    KvStore Engine                        │  │</span></span>
+<span class="giallo-l"><span>│   │                                                         │  │</span></span>
+<span class="giallo-l"><span>│   │  ┌─────────────┐    ┌─────────────┐    ┌────────────┐  │  │</span></span>
+<span class="giallo-l"><span>│   │  │    SET      │    │    GET      │    │    RM      │  │  │</span></span>
+<span class="giallo-l"><span>│   │  │  (write)    │    │   (read)    │    │ (delete)   │  │  │</span></span>
+<span class="giallo-l"><span>│   │  └──────┬──────┘    └──────┬──────┘    └──────┬─────┘  │  │</span></span>
+<span class="giallo-l"><span>│   │         │                 │                 │        │  │</span></span>
+<span class="giallo-l"><span>│   │         ▼                 │                 │        │  │</span></span>
+<span class="giallo-l"><span>│   │  ┌─────────────────────────────────────────┐ │        │  │</span></span>
+<span class="giallo-l"><span>│   │  │         In-Memory Index (HashMap)       │ │        │  │</span></span>
+<span class="giallo-l"><span>│   │  │  key1 → {file: 0, offset: 0, len: 45}  │ │        │  │</span></span>
+<span class="giallo-l"><span>│   │  │  key2 → {file: 0, offset: 45, len: 38} │◀┘        │  │</span></span>
+<span class="giallo-l"><span>│   │  │  key3 → {file: 1, offset: 0, len: 52}  │◀┴────────┘  │  │</span></span>
+<span class="giallo-l"><span>│   │  └─────────────────────────────────────────┘            │  │</span></span>
+<span class="giallo-l"><span>│   │                         │                               │  │</span></span>
+<span class="giallo-l"><span>│   │                         ▼                               │  │</span></span>
+<span class="giallo-l"><span>│   │  ┌─────────────────────────────────────────────────┐    │  │</span></span>
+<span class="giallo-l"><span>│   │  │            Log Manager                           │    │  │</span></span>
+<span class="giallo-l"><span>│   │  │  • Append-only writes                           │    │  │</span></span>
+<span class="giallo-l"><span>│   │  │  • File rotation (1KB chunks - testing)         │    │  │</span></span>
+<span class="giallo-l"><span>│   │  │  • Compaction when stale &gt; 2KB                  │    │  │</span></span>
+<span class="giallo-l"><span>│   │  └─────────────────────────────────────────────────┘    │  │</span></span>
+<span class="giallo-l"><span>│   │                         │                               │  │</span></span>
+<span class="giallo-l"><span>│   └─────────────────────────┼───────────────────────────────┘  │</span></span>
+<span class="giallo-l"><span>│                             │                                   │</span></span>
+<span class="giallo-l"><span>│                             ▼                                   │</span></span>
+<span class="giallo-l"><span>│                    ┌────────────────┐                          │</span></span>
+<span class="giallo-l"><span>│                    │   ./logs/       │                          │</span></span>
+<span class="giallo-l"><span>│                    │  ├── 0.log     │                          │</span></span>
+<span class="giallo-l"><span>│                    │  ├── 1.log     │                          │</span></span>
+<span class="giallo-l"><span>│                    │  └── 2.log     │                          │</span></span>
+<span class="giallo-l"><span>│                    └────────────────┘                          │</span></span>
+<span class="giallo-l"><span>│                                                                 │</span></span>
+<span class="giallo-l"><span>└─────────────────────────────────────────────────────────────────┘</span></span></code></pre><h3 id="chapter-10-handling-deletes">Chapter 10: Handling Deletes</h3>
+<p>What happens when you delete a key? We don't actually remove the data immediately—that would require random writes. Instead, we append a "tombstone" marker:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub fn remove(&amp;mut self, key: String) -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>    match self.store.get(&amp;key) {</span></span>
+<span class="giallo-l"><span>        Some(lg) =&gt; {</span></span>
+<span class="giallo-l"><span>            // Write a &quot;remove&quot; command to the log</span></span>
+<span class="giallo-l"><span>            let ser = serde_json::to_string(&amp;Command::Rm { key: key.clone() }).unwrap();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>            let mut file = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>                .append(true)</span></span>
+<span class="giallo-l"><span>                .open(self.dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, lg.file_id)))?;</span></span>
+<span class="giallo-l"><span>            </span></span>
+<span class="giallo-l"><span>            match writeln!(file, &quot;{}&quot;, ser) {</span></span>
+<span class="giallo-l"><span>                Ok(_) =&gt; {</span></span>
+<span class="giallo-l"><span>                    // Remove from in-memory index</span></span>
+<span class="giallo-l"><span>                    self.store.remove(&amp;key);</span></span>
+<span class="giallo-l"><span>                    println!(&quot;Removed {}&quot;, key);</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>                Err(e) =&gt; {</span></span>
+<span class="giallo-l"><span>                    eprintln!(&quot;{e}&quot;);</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>            </span></span>
+<span class="giallo-l"><span>            // Track for compaction</span></span>
+<span class="giallo-l"><span>            self.uncompacted_bytes += ser.len() as u32;</span></span>
+<span class="giallo-l"><span>            if self.uncompacted_bytes &gt; 1024 * 2 {</span></span>
+<span class="giallo-l"><span>                self.compact()?;</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        None =&gt; {</span></span>
+<span class="giallo-l"><span>            println!(&quot;Key not found&quot;);</span></span>
+<span class="giallo-l"><span>            process::exit(0);</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>    Ok(())</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>The delete marker tells compaction to exclude this key when rewriting the log. The old entry becomes "stale" just like an updated key.</p>
+<h3 id="chapter-11-the-opening-process-bootstrapping">Chapter 11: The Opening Process (Bootstrapping)</h3>
+<p>When KVS1 starts up, it needs to rebuild the in-memory index from the log files. This is called "replay" or "recovery":</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>pub fn open(dir: PathBuf) -&gt; Result&lt;KvStore&gt; {</span></span>
+<span class="giallo-l"><span>    // Create logs directory if it doesn&#39;t exist</span></span>
+<span class="giallo-l"><span>    std::fs::create_dir_all(dir.join(&quot;logs&quot;))?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    let mut files = Vec::new();</span></span>
+<span class="giallo-l"><span>    let mut store = HashMap::new();</span></span>
+<span class="giallo-l"><span>    let mut uncompacted_bytes: u32 = 0;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Scan existing log files</span></span>
+<span class="giallo-l"><span>    if let Ok(entry) = read_dir(dir.join(&quot;logs&quot;)) {</span></span>
+<span class="giallo-l"><span>        for i in entry {</span></span>
+<span class="giallo-l"><span>            if let Ok(diry) = i {</span></span>
+<span class="giallo-l"><span>                if let Some(pt) = diry.file_name().into_string().ok() {</span></span>
+<span class="giallo-l"><span>                    // Parse file IDs from filenames like &quot;0.log&quot;, &quot;1.log&quot;</span></span>
+<span class="giallo-l"><span>                    let ck = pt.trim_end_matches(&quot;.log&quot;).parse::&lt;u32&gt;();</span></span>
+<span class="giallo-l"><span>                    if let Ok(ck) = ck {</span></span>
+<span class="giallo-l"><span>                        files.push(ck);</span></span>
+<span class="giallo-l"><span>                    }</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        files.sort();</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>        // Replay each file in order</span></span>
+<span class="giallo-l"><span>        for file in files.iter() {</span></span>
+<span class="giallo-l"><span>            let d = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>                .create(true)</span></span>
+<span class="giallo-l"><span>                .read(true)</span></span>
+<span class="giallo-l"><span>                .append(true)</span></span>
+<span class="giallo-l"><span>                .open(dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, file)))?;</span></span>
+<span class="giallo-l"><span>            </span></span>
+<span class="giallo-l"><span>            let mut reader = BufReader::new(d);</span></span>
+<span class="giallo-l"><span>            let mut offset = 0;</span></span>
+<span class="giallo-l"><span>            </span></span>
+<span class="giallo-l"><span>            loop {</span></span>
+<span class="giallo-l"><span>                let mut line = String::new();</span></span>
+<span class="giallo-l"><span>                let bytes_read = reader.read_line(&amp;mut line)?;</span></span>
+<span class="giallo-l"><span>                </span></span>
+<span class="giallo-l"><span>                if bytes_read == 0 {</span></span>
+<span class="giallo-l"><span>                    break;</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>                </span></span>
+<span class="giallo-l"><span>                // Parse and apply each command</span></span>
+<span class="giallo-l"><span>                let cmd: Command = serde_json::from_str(&amp;line).unwrap();</span></span>
+<span class="giallo-l"><span>                match cmd {</span></span>
+<span class="giallo-l"><span>                    Command::Rm { key } =&gt; {</span></span>
+<span class="giallo-l"><span>                        // Delete removes from index</span></span>
+<span class="giallo-l"><span>                        store.remove(&amp;key);</span></span>
+<span class="giallo-l"><span>                        uncompacted_bytes += bytes_read as u32;</span></span>
+<span class="giallo-l"><span>                    }</span></span>
+<span class="giallo-l"><span>                    Command::Get { .. } =&gt; {}  // Skip read commands</span></span>
+<span class="giallo-l"><span>                    Command::Set { key, .. } =&gt; {</span></span>
+<span class="giallo-l"><span>                        // Set updates the index to point to latest location</span></span>
+<span class="giallo-l"><span>                        store.insert(</span></span>
+<span class="giallo-l"><span>                            key,</span></span>
+<span class="giallo-l"><span>                            LogPointer {</span></span>
+<span class="giallo-l"><span>                                offset,</span></span>
+<span class="giallo-l"><span>                                len: bytes_read as u32,</span></span>
+<span class="giallo-l"><span>                                file_id: *file,</span></span>
+<span class="giallo-l"><span>                            },</span></span>
+<span class="giallo-l"><span>                        );</span></span>
+<span class="giallo-l"><span>                        uncompacted_bytes += bytes_read as u32;</span></span>
+<span class="giallo-l"><span>                    }</span></span>
+<span class="giallo-l"><span>                }</span></span>
+<span class="giallo-l"><span>                offset += bytes_read as u32;</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    }</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    // Open current log file for writing</span></span>
+<span class="giallo-l"><span>    let current_file_id = files.last().copied().unwrap_or(0);</span></span>
+<span class="giallo-l"><span>    let path = dir.join(&quot;logs&quot;).join(format!(&quot;{}.log&quot;, current_file_id));</span></span>
+<span class="giallo-l"><span>    let wrifile = OpenOptions::new()</span></span>
+<span class="giallo-l"><span>        .create(true)</span></span>
+<span class="giallo-l"><span>        .write(true)</span></span>
+<span class="giallo-l"><span>        .read(true)</span></span>
+<span class="giallo-l"><span>        .append(true)</span></span>
+<span class="giallo-l"><span>        .open(&amp;path)?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    Ok(KvStore {</span></span>
+<span class="giallo-l"><span>        store,</span></span>
+<span class="giallo-l"><span>        dir,</span></span>
+<span class="giallo-l"><span>        writer: BufWriter::new(wrifile),</span></span>
+<span class="giallo-l"><span>        current_file_id,</span></span>
+<span class="giallo-l"><span>        uncompacted_bytes,</span></span>
+<span class="giallo-l"><span>    })</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This is the beauty of log-structured storage: <strong>recovery is simple</strong>. Just replay the log from beginning to end, and you get the exact same state you had before the crash. No complex recovery procedures needed.</p>
+<hr />
+<h3 id="chapter-12-the-command-system">Chapter 12: The Command System</h3>
+<p>KVS1 uses a simple command enum that's serialized to JSON:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#[derive(Subcommand, Deserialize, Serialize, Debug)]</span></span>
+<span class="giallo-l"><span>pub enum Command {</span></span>
+<span class="giallo-l"><span>    Get { key: String },</span></span>
+<span class="giallo-l"><span>    Set { key: String, value: String },</span></span>
+<span class="giallo-l"><span>    Rm { key: String },</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>This makes the log human-readable and easy to debug. Each line in the log file is a valid JSON object:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>{&quot;key&quot;:&quot;username&quot;,&quot;value&quot;:&quot;john&quot;,&quot;cmd&quot;:&quot;Set&quot;}</span></span>
+<span class="giallo-l"><span>{&quot;key&quot;:&quot;email&quot;,&quot;value&quot;:&quot;john@example.com&quot;,&quot;cmd&quot;:&quot;Set&quot;}</span></span>
+<span class="giallo-l"><span>{&quot;key&quot;:&quot;username&quot;,&quot;cmd&quot;:&quot;Rm&quot;}</span></span>
+<span class="giallo-l"><span>{&quot;key&quot;:&quot;username&quot;,&quot;value&quot;:&quot;jane&quot;,&quot;cmd&quot;:&quot;Set&quot;}</span></span></code></pre>
+<hr />
+<h3 id="chapter-13-project-structure-and-usage">Chapter 13: Project Structure and Usage</h3>
+<p>The KVS1 project structure:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>dummy_kvs1/</span></span>
+<span class="giallo-l"><span>├── Cargo.toml           # Rust package definition</span></span>
+<span class="giallo-l"><span>├── src/</span></span>
+<span class="giallo-l"><span>│   ├── main.rs         # CLI entry point with command parsing</span></span>
+<span class="giallo-l"><span>│   ├── lib.rs          # Library root with error types</span></span>
+<span class="giallo-l"><span>│   └── kvs.rs          # Core KvStore implementation</span></span>
+<span class="giallo-l"><span>├── logs/               # Runtime log files (created at runtime)</span></span>
+<span class="giallo-l"><span>│   ├── 0.log</span></span>
+<span class="giallo-l"><span>│   ├── 1.log</span></span>
+<span class="giallo-l"><span>│   └── ...</span></span>
+<span class="giallo-l"><span>└── target/             # Compiled artifacts</span></span></code></pre>
+<p>The CLI uses <code>clap</code> for argument parsing:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span>#[derive(Parser)]</span></span>
+<span class="giallo-l"><span>#[command(about, version)]</span></span>
+<span class="giallo-l"><span>struct Cli {</span></span>
+<span class="giallo-l"><span>    #[command(subcommand)]</span></span>
+<span class="giallo-l"><span>    cmd: Command,</span></span>
+<span class="giallo-l"><span>}</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span>fn main() -&gt; Result&lt;()&gt; {</span></span>
+<span class="giallo-l"><span>    let cli = Cli::parse();</span></span>
+<span class="giallo-l"><span>    let dir = env::current_dir()?;</span></span>
+<span class="giallo-l"><span>    let mut kvs = KvStore::open(dir)?;</span></span>
+<span class="giallo-l"><span>    </span></span>
+<span class="giallo-l"><span>    match cli.cmd {</span></span>
+<span class="giallo-l"><span>        Command::Get { key } =&gt; {</span></span>
+<span class="giallo-l"><span>            let ans = kvs.get(key)?;</span></span>
+<span class="giallo-l"><span>            if let Some(ans) = ans {</span></span>
+<span class="giallo-l"><span>                println!(&quot;Found {}&quot;, ans);</span></span>
+<span class="giallo-l"><span>            }</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        Command::Set { key, value } =&gt; {</span></span>
+<span class="giallo-l"><span>            kvs.set(key, value)?;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>        Command::Rm { key } =&gt; {</span></span>
+<span class="giallo-l"><span>            kvs.remove(key)?;</span></span>
+<span class="giallo-l"><span>        }</span></span>
+<span class="giallo-l"><span>    };</span></span>
+<span class="giallo-l"><span>    Ok(())</span></span>
+<span class="giallo-l"><span>}</span></span></code></pre>
+<p>Usage:</p>
+<pre class="giallo z-code"><code data-lang="plain"><span class="giallo-l"><span># Set a key-value pair</span></span>
+<span class="giallo-l"><span>cargo run -- set username john</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Get a value</span></span>
+<span class="giallo-l"><span>cargo run -- get username</span></span>
+<span class="giallo-l"></span>
+<span class="giallo-l"><span># Delete a key</span></span>
+<span class="giallo-l"><span>cargo run -- rm username</span></span></code></pre>
+<hr />
+<h2 id="epilogue-the-road-ahead">Epilogue: The Road Ahead</h2>
+<p>Building KVS1 taught me things no tutorial could.</p>
+<p>When I did the 1BRC challenge, I learned about SIMD, memory layouts, hash maps, and data processing. But I always felt like I was working with ephemeral data—everything disappeared when the program ended.</p>
+<p>With KVS1, I built persistent storage from scratch. Now I understand:</p>
+<ol>
+<li><strong>Why Redis is so fast</strong> - It's essentially an in-memory index with optional persistence</li>
+<li><strong>How PostgreSQL recovers from crashes</strong> - It replays the WAL (write-ahead log)</li>
+<li><strong>Why SSDs matter for databases</strong> - Random writes were the bottleneck; now they're faster</li>
+<li><strong>The true cost of "simple" operations</strong> - Every feature has tradeoffs</li>
+</ol>
+<p>But this is just Part 1.</p>
+<p>The next part of Aryavarth will cover:</p>
+<ul>
+<li><strong>Network layer</strong> - Adding RPC capabilities to communicate between nodes</li>
+<li><strong>Sharding</strong> - Distributing keys across multiple machines</li>
+<li><strong>Replication</strong> - Making data durable across failures</li>
+<li><strong>Consistency</strong> - Handling concurrent writes and conflicts</li>
+</ul>
+<p>The goal is to build a truly distributed key-value store that can scale across multiple machines while maintaining consistency and performance.</p>
+<p><em>Aryavarth: Building a distributed key-value store</em><br />
+<a href="/aryavarth1">Part 1</a> | <a href="/aryavarth2">Part 2: The Networking Layer &amp; Lock-Free Concurrency</a><br />
+<a rel="external" href="https://github.com/ygndotgg/kvs_store">GitHub</a></p>
+
+        
+    </article>
+
+    <!-- Comment section -->
+    
+      
+        
+          <script
+  src="https://giscus.app/client.js"
+  data-repo="ygndotgg&#x2F;ygndotgg.github.io"
+  data-repo-id="R_kgDORbe62A"
+  data-category="General"
+  data-category-id="DIC_kwDORbe62M4C3cVZ"
+  data-mapping="pathname"
+  data-strict="0"
+  data-reactions-enabled="1"
+  data-emit-metadata="0"
+  data-input-position="bottom"
+
+  
+  data-theme="preferred_color_scheme"
+  
+
+  data-lang="en"
+  data-loading="lazy"
+  crossorigin="anonymous"
+  async
+></script>
+
+        
+      
+    
+
+
+    <!-- Page footer -->
+    
+    <footer>
+        <hr>
+        <p>
+            
+            
+                
+                in <a href="https://ygndotgg.github.io/categories/rust/">rust</a>
+            
+            
+                and
+                tagged
+                
+                    <a href="https://ygndotgg.github.io/tags/rust/">rust</a>
+                    
+                        
+                            
+                                ,
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/distributed-systems/">distributed-systems</a>
+                    
+                        
+                            
+                                and
+                            
+                        
+                    
+                
+                    <a href="https://ygndotgg.github.io/tags/storage/">storage</a>
+                    
+                        
+                    
+                
+            
+        </p>
+
+        <!-- Revision history (optional) -->
+        
+          
+            
+              
+            
+          
+        
+
+        
+        
+    </footer>
+
+
+</article>
+
+
+    </main>
+    
+
+  </body>
+</html>
