@@ -1,4 +1,4 @@
-name: Zola on GitHub Pages
+name: Zola Deploy to Pages
 
 on:
   push:
@@ -16,19 +16,8 @@ jobs:
         with:
           submodules: true
 
-      - name: Install Zola
-        run: |
-          wget https://github.com/getzola/zola/releases/download/v0.18.0/zola-v0.18.0-x86_64-unknown-linux-gnu.tar.gz
-          tar -xzf zola-v0.18.0-x86_64-unknown-linux-gnu.tar.gz
-          mv zola /usr/local/bin/
-
-      - name: Build site
-        run: zola build
-
-      - name: Deploy
-        uses: peaceiris/actions-gh-pages@v3
+      - name: Zola Deploy
+        uses: shalzz/zola-deploy-action@v0.22.1
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./public
-          publish_branch: gh-pages
-          force_orphan: true
+          target_branch: gh-pages
+          build_options: --force
