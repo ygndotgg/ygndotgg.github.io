@@ -18,6 +18,7 @@ jobs:
 
       - name: Zola Deploy
         uses: shalzz/zola-deploy-action@v0.22.1
-        with:
-          target_branch: gh-pages
-          build_options: --force
+        env:
+          TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TARGET_BRANCH: gh-pages
+          BUILD_OPTIONS: --force
