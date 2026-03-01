@@ -46,7 +46,7 @@ include_content = true
 [extra]
 author = "YGN"
 comments = true
-giscus_repo = "ygndotgg/personal-blog"
+giscus_repo = "ygndotgg/ygndotgg.github.io"
 giscus_repo_id = "R_kgDORbe62A"
 giscus_data_category_id = "DIC_kwDORbe62M4C3cVZ"
 giscus_data_category = "General"
